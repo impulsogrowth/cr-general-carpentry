@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>C&R General Carpentry Miami | Custom Kitchens, Cabinets, Closets & TV Mounts</title>
+  <meta name="description" content="Miami's #1 custom carpentry. Kitchens, cabinets, closets, TV wall mounts. Free quote. Call (786) 803-6784."/>
+  <meta name="keywords" content="custom carpentry Miami, custom kitchens Miami, custom cabinets Miami, custom closets Miami, TV wall mount Miami, carpenter Miami"/>
+  <meta property="og:title" content="C&R General Carpentry Miami"/>
+  <meta property="og:description" content="Custom kitchens, cabinets, closets & TV mounts. Miami's trusted carpentry team. Call (786) 803-6784."/>
+  <meta property="og:image" content="images/logo.jpg"/>
+  <meta name="robots" content="index,follow"/>
+  <link rel="canonical" href="https://crgeneralcarpentry.com/"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"HomeAndConstructionBusiness","name":"C&R General Carpentry","telephone":"+17868036784","email":"crgeneralcarpentry@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Miami","addressRegion":"FL","addressCountry":"US"},"url":"https://crgeneralcarpentry.com","sameAs":["https://www.instagram.com/CRGeneralCarpentry"],"aggregateRating":{"@type":"AggregateRating","ratingValue":"5","reviewCount":"47"}}</script>
+
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --black:#0A0A0A;
+      --cream:#F5F0E8;
+      --gold:#C4933F;
+      --gold-lt:#E8B96A;
+      --white:#FFFFFF;
+      --gray:#888;
+      --dark:#111;
+    }
+    html{scroll-behavior:smooth;font-size:16px}
+    body{font-family:'Space Grotesk',sans-serif;background:var(--black);color:var(--white);overflow-x:hidden;cursor:none}
+
+    /* ── CURSOR ── */
+    #cur{width:6px;height:6px;background:var(--white);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%)}
+    #cur-r{width:36px;height:36px;border:1.5px solid var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s,border-color .3s,background .3s}
+    #cur-r.hov{width:64px;height:64px;background:rgba(196,147,63,.08);border-color:var(--gold-lt)}
+    @media(max-width:768px){body{cursor:auto}#cur,#cur-r{display:none}}
+
+    /* ── LANG BTN ── */
+    .lang-btn{background:rgba(196,147,63,.12);border:1px solid rgba(196,147,63,.35);color:var(--gold-lt);font-size:.7rem;font-weight:800;padding:.35rem .8rem;border-radius:20px;cursor:pointer;font-family:inherit;letter-spacing:.1em;transition:all .2s}
+    .lang-btn:hover{background:rgba(196,147,63,.25)}
+
+    /* ── NAV ── */
+    nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:.6rem 2.5rem;display:flex;align-items:center;justify-content:space-between;transition:background .4s,padding .4s}
+    nav.solid{background:rgba(10,10,10,.97);backdrop-filter:blur(24px);padding:.5rem 2.5rem;border-bottom:1px solid rgba(255,255,255,.07)}
+    .nav-logo{text-decoration:none;display:flex;align-items:center}
+    .nav-links{display:flex;gap:2.5rem;align-items:center}
+    .nav-links a{color:rgba(255,255,255,.7);text-decoration:none;font-size:.95rem;font-weight:600;letter-spacing:.02em;transition:color .2s}
+    .nav-links a:hover{color:var(--gold-lt)}
+    .nav-phone{color:var(--gold-lt)!important;font-weight:700!important;font-size:1rem!important}
+    .nav-cta{padding:.65rem 1.5rem;background:var(--gold);border-radius:7px;color:var(--black)!important;font-weight:800!important;font-size:.9rem!important;letter-spacing:.02em;transition:all .2s!important}
+    .nav-cta:hover{background:var(--gold-lt)!important;transform:translateY(-1px)}
+    .hamburger{display:none;background:none;border:none;color:var(--white);font-size:1.6rem;cursor:pointer}
+
+    /* ── HERO ── */
+    .hero{height:100vh;min-height:700px;position:relative;display:flex;align-items:flex-end;padding:0 2.5rem 5rem;overflow:hidden}
+    .hero-video{position:absolute;inset:0;z-index:0}
+    .hero-video::after{display:none}
+    .hero-content{position:relative;z-index:3;max-width:860px}
+    .hero-tag{display:inline-flex;align-items:center;gap:.5rem;background:rgba(196,147,63,.15);border:1px solid rgba(196,147,63,.3);border-radius:30px;padding:.45rem 1.2rem;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-lt);margin-bottom:1.5rem}
+    .hero h1{font-family:'Playfair Display',serif;font-size:clamp(3.2rem,7.5vw,7rem);font-weight:900;line-height:.95;letter-spacing:-2px;margin-bottom:1.5rem}
+    .hero h1 em{color:var(--gold-lt);font-style:italic}
+    .hero-sub{font-size:clamp(1rem,1.6vw,1.15rem);color:rgba(255,255,255,.65);margin-bottom:2.5rem;max-width:520px;line-height:1.75;font-weight:400}
+    .hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+    .btn-gold{padding:1rem 2.4rem;background:var(--gold);border:none;border-radius:8px;color:var(--black);font-size:1rem;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:all .25s;letter-spacing:.02em}
+    .btn-gold:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,147,63,.4)}
+    .btn-outline{padding:1rem 2.4rem;background:transparent;border:1.5px solid rgba(255,255,255,.35);border-radius:8px;color:var(--white);font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:all .25s}
+    .btn-outline:hover{border-color:var(--gold-lt);color:var(--gold-lt)}
+    .hero-scroll-hint{position:absolute;bottom:2rem;right:2.5rem;z-index:3;display:flex;flex-direction:column;align-items:center;gap:.5rem;color:rgba(255,255,255,.35);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase}
+    .hero-scroll-hint::before{content:'';width:1px;height:50px;background:linear-gradient(to bottom,transparent,rgba(196,147,63,.5))}
+
+    /* ── TICKER ── */
+    .ticker{background:var(--gold);padding:.7rem 0;overflow:hidden;white-space:nowrap}
+    .ticker-inner{display:inline-flex;gap:0;animation:tick 20s linear infinite}
+    .ticker-item{font-size:.82rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:var(--black);padding:0 2.5rem}
+    .ticker-item::after{content:'·';margin-left:2.5rem}
+    @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+    /* ── SECTION BASE ── */
+    section{padding:4rem 2.5rem}
+    .container{max-width:1200px;margin:0 auto}
+    .s-label{font-size:.78rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+    .s-title{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4.5vw,3.5rem);font-weight:900;letter-spacing:-1.5px;line-height:1.05;margin-bottom:1.2rem}
+
+    /* ── WORK GRID ── */
+    #work{background:var(--black);padding:4rem 2.5rem}
+    .work-grid{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:280px 280px;gap:.75rem;margin-top:1.5rem}
+    .wg-item{overflow:hidden;border-radius:10px;position:relative;cursor:pointer}
+    .wg-item img,.wg-item video{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease}
+    .wg-item:hover img,.wg-item:hover video{transform:scale(1.05)}
+    .wg-1{grid-column:1/6;grid-row:1/2}
+    .wg-2{grid-column:6/9;grid-row:1/2}
+    .wg-3{grid-column:9/13;grid-row:1/2}
+    .wg-4{grid-column:1/5;grid-row:2/3}
+    .wg-5{grid-column:5/9;grid-row:2/3}
+    .wg-6{grid-column:9/13;grid-row:2/3}
+    .wg-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.7),transparent);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:1.2rem}
+    .wg-item:hover .wg-overlay{opacity:1}
+    .wg-label{color:var(--white);font-size:.78rem;font-weight:700;letter-spacing:.04em}
+
+    /* ── VIDEO SHOWCASE ── */
+    #videos{background:var(--dark);padding:0}
+    .video-showcase{display:grid;grid-template-columns:repeat(3,1fr);gap:0;height:520px}
+    .vs-item{position:relative;height:100%;overflow:hidden;cursor:pointer}
+    .vs-item video{width:100%;height:100%;object-fit:cover}
+    .vs-item::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,.6),transparent 50%)}
+    .vs-caption{position:absolute;bottom:1.2rem;left:1.2rem;right:1.2rem;z-index:2;color:var(--white);font-size:.78rem;font-weight:600;opacity:0;transform:translateY(8px);transition:all .3s}
+    .vs-item:hover .vs-caption{opacity:1;transform:translateY(0)}
+
+    /* ── SERVICES ── */
+    #services{background:var(--cream)}
+    #services .s-title{color:var(--black)}
+    #services .s-label{color:var(--gold)}
+    .services-list{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:1.5rem}
+    .svc{border-bottom:2px solid rgba(10,10,10,.1);padding:2rem 0;transition:border-color .3s;cursor:default}
+    .svc:hover{border-color:var(--gold)}
+    .svc-num{font-size:.78rem;font-weight:700;color:var(--gold);letter-spacing:.12em;margin-bottom:.75rem}
+    .svc-name{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--black);margin-bottom:.5rem;letter-spacing:-.5px}
+    .svc-desc{font-size:.92rem;color:#555;line-height:1.7}
+    .svc-tag{display:inline-block;margin-top:.75rem;font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:20px;padding:.28rem .8rem}
+
+    /* ── STATS ── */
+    .stats-strip{background:var(--black);padding:3.5rem 2.5rem;display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;text-align:center;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
+    .stat-num{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,5vw,4rem);font-weight:900;color:var(--gold-lt);line-height:1}
+    .stat-lbl{font-size:.88rem;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-top:.6rem;font-weight:500}
+
+    /* ── CALCULATOR ── */
+    #calc{background:#0f0f0f;padding:4rem 2.5rem}
+    #calc .s-title{color:var(--white)}
+    .calc-wrap{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;margin-top:1.5rem}
+    .calc-left{display:flex;flex-direction:column;gap:1.2rem}
+    .calc-group{display:flex;flex-direction:column;gap:.4rem}
+    .calc-group label{font-size:.8rem;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em}
+    .calc-pills{display:flex;flex-wrap:wrap;gap:.5rem}
+    .calc-pill{padding:.5rem 1.1rem;border-radius:30px;border:1.5px solid rgba(255,255,255,.12);background:transparent;color:rgba(255,255,255,.6);font-size:.85rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+    .calc-pill.on{border-color:var(--gold);background:rgba(196,147,63,.12);color:var(--gold-lt)}
+    .calc-slider{-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.1);outline:none;cursor:pointer}
+    .calc-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 2px 8px rgba(196,147,63,.5)}
+    .calc-slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;border:none}
+    .slider-val{font-size:.82rem;color:var(--gold-lt);font-weight:700;margin-top:.3rem}
+    .calc-checks{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+    .calc-check{display:flex;align-items:center;gap:.6rem;cursor:pointer}
+    .calc-check input{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;flex-shrink:0}
+    .calc-check span{font-size:.88rem;color:rgba(255,255,255,.65)}
+    .calc-result{background:rgba(255,255,255,.03);border:1px solid rgba(196,147,63,.25);border-radius:20px;padding:2rem;position:sticky;top:130px}
+    .calc-result-label{font-size:.8rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
+    .calc-price{font-family:'Playfair Display',serif;font-size:clamp(2rem,3vw,3rem);font-weight:900;color:var(--gold-lt);line-height:1;margin-bottom:.5rem}
+    .calc-breakdown{margin:1.2rem 0;border-top:1px solid rgba(255,255,255,.06);padding-top:1rem}
+    .calc-line{display:flex;justify-content:space-between;font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:.5rem}
+    .calc-line.total{color:var(--white);font-weight:700;font-size:.95rem;border-top:1px solid rgba(255,255,255,.12);padding-top:.6rem;margin-top:.4rem}
+    .calc-note{font-size:.85rem;color:rgba(255,255,255,.35);line-height:1.65;margin-bottom:1.2rem}
+    .calc-cta{display:block;width:100%;padding:1rem;background:var(--gold);border:none;border-radius:10px;color:var(--black);font-size:.95rem;font-weight:800;cursor:pointer;font-family:inherit;text-decoration:none;text-align:center;transition:all .3s}
+    .calc-cta:hover{background:var(--gold-lt);transform:translateY(-1px)}
+
+    /* ── BEFORE/AFTER ── */
+    #ba{background:#111;padding:4rem 2.5rem}
+    #ba .s-title{color:var(--white)}
+    .ba-wrap{position:relative;border-radius:14px;overflow:hidden;height:500px;user-select:none;touch-action:none;cursor:col-resize;margin-top:2.5rem}
+    .ba-before,.ba-after{position:absolute;inset:0}
+    .ba-before img,.ba-after img{width:100%;height:100%;object-fit:cover;display:block}
+    .ba-after{clip-path:inset(0 50% 0 0)}
+    .ba-handle{position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--white);transform:translateX(-50%);z-index:10}
+    .ba-handle::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:var(--white);box-shadow:0 4px 20px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}
+    .ba-handle::after{content:'◀ ▶';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.55rem;color:var(--black);font-weight:900;letter-spacing:2px;white-space:nowrap}
+    .ba-label{position:absolute;bottom:1.2rem;padding:.4rem 1rem;border-radius:20px;font-size:.82rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+    .ba-label.b{left:1.2rem;background:rgba(10,10,10,.7);color:rgba(255,255,255,.8);backdrop-filter:blur(8px)}
+    .ba-label.a{right:1.2rem;background:var(--gold);color:var(--black)}
+
+    /* ── REVIEWS ── */
+    #reviews{background:var(--black);padding:4rem 2.5rem}
+    .reviews-carousel{margin-top:1.5rem;overflow:hidden}
+    .reviews-track{display:flex;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
+    .reviews-slide{min-width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem}
+    .rv{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:2rem;transition:all .3s;position:relative}
+    .rv::before{content:'';position:absolute;top:0;left:0;width:3px;height:0;background:var(--gold);border-radius:2px;transition:height .4s}
+    .rv:hover{background:rgba(255,255,255,.07)}
+    .rv:hover::before{height:100%}
+    .rv-stars{color:var(--gold);font-size:1.05rem;letter-spacing:3px;margin-bottom:1rem}
+    .rv-text{font-size:.95rem;color:rgba(255,255,255,.75);line-height:1.8;font-style:italic;margin-bottom:1.2rem}
+    .rv-author{display:flex;align-items:center;gap:.75rem}
+    .rv-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#8B5E3C,var(--gold));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.95rem;flex-shrink:0}
+    .rv-name{font-size:.95rem;font-weight:700}
+    .rv-loc{font-size:.8rem;color:var(--gray)}
+    .rv-dots{display:flex;gap:.5rem;justify-content:center;margin-top:1.5rem}
+    .rv-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);border:none;cursor:pointer;transition:all .3s;padding:0}
+    .rv-dot.on{background:var(--gold);width:24px;border-radius:4px}
+
+    /* ── INSTAGRAM FEED ── */
+    #gram{background:var(--dark);padding:4rem 2.5rem}
+    .gram-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:1.5rem}
+    .gram-item{aspect-ratio:1;border-radius:8px;overflow:hidden;position:relative;cursor:pointer}
+    .gram-item video,.gram-item img{width:100%;height:100%;object-fit:cover;display:block}
+    .gram-item .gram-more{position:absolute;inset:0;background:rgba(10,10,10,.75);display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--white);font-weight:800;font-size:.9rem;gap:.3rem}
+
+    /* ── QUOTE FORM ── */
+    #quote{background:var(--cream);padding:4rem 2.5rem}
+    .quote-wrap{max-width:720px;margin:0 auto}
+    #quote .s-title{color:var(--black)}
+    #quote .s-label{color:var(--gold)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem}
+    .fg{display:flex;flex-direction:column;gap:.35rem}
+    .fg.full{grid-column:span 2}
+    .fg label{font-size:.8rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.07em}
+    .fg input,.fg select,.fg textarea{background:var(--white);border:1.5px solid #e0d9d0;border-radius:8px;padding:.8rem 1rem;font-size:.88rem;font-family:inherit;color:var(--black);outline:none;transition:border-color .2s;width:100%}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold)}
+    .fg textarea{resize:vertical;min-height:100px}
+    .fg select option{background:var(--white)}
+    .submit-btn{width:100%;padding:1.1rem;background:var(--gold);border:none;border-radius:10px;color:var(--black);font-size:.95rem;font-weight:800;cursor:pointer;font-family:inherit;transition:all .3s;margin-top:.5rem;letter-spacing:.02em}
+    .submit-btn:hover{background:#b8862e;box-shadow:0 8px 24px rgba(196,147,63,.4);transform:translateY(-1px)}
+    .form-note{font-size:.85rem;color:#999;text-align:center;margin-top:.75rem}
+    #form-ok{display:none;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px;padding:1.2rem;color:#6ee7b7;font-weight:600;text-align:center;margin-top:1rem}
+
+    /* ── FOOTER ── */
+    footer{background:var(--black);padding:4rem 2.5rem 2rem;border-top:1px solid rgba(255,255,255,.07)}
+    .footer-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3rem;flex-wrap:wrap;gap:2rem}
+    .footer-logo{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:var(--white)}
+    .footer-logo span{color:var(--gold)}
+    .footer-slogan{font-size:.95rem;color:rgba(255,255,255,.45);margin-top:.4rem;font-style:italic}
+    .footer-links{display:flex;gap:3rem;flex-wrap:wrap}
+    .footer-col h5{font-size:.78rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+    .footer-col a,.footer-col p{display:block;color:rgba(255,255,255,.5);text-decoration:none;font-size:.92rem;margin-bottom:.5rem;transition:color .2s}
+    .footer-col a:hover{color:var(--gold-lt)}
+    .footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+    .footer-copy{font-size:.85rem;color:rgba(255,255,255,.3)}
+    .footer-ig{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-weight:700;font-size:.82rem;text-decoration:none}
+
+    /* ── FLOAT BTNS ── */
+    .floats{position:fixed;bottom:1.5rem;right:1.5rem;z-index:400;display:flex;flex-direction:column;gap:.6rem;align-items:flex-end}
+    .float-wa{padding:.75rem 1.3rem;background:linear-gradient(135deg,#25d366,#128c7e);border-radius:40px;color:var(--white);font-weight:800;font-size:.82rem;text-decoration:none;display:flex;align-items:center;gap:.5rem;box-shadow:0 6px 20px rgba(0,0,0,.3);transition:all .3s}
+    .float-wa:hover{transform:translateY(-3px);filter:brightness(1.1)}
+    .float-q{padding:.75rem 1.3rem;background:var(--gold);border-radius:40px;color:var(--black);font-weight:800;font-size:.82rem;text-decoration:none;display:flex;align-items:center;gap:.5rem;box-shadow:0 6px 20px rgba(196,147,63,.4);animation:bob 3s ease-in-out infinite;transition:all .3s}
+    .float-q:hover{transform:translateY(-3px)!important;filter:brightness(1.1)}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+    /* ── REVEAL ── */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.on{opacity:1;transform:translateY(0)}
+    .reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}
+
+    /* ── MOBILE ── */
+    @media(max-width:1000px){
+      .work-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto}.wg-1,.wg-2,.wg-3,.wg-4,.wg-5,.wg-6{grid-column:span 1;grid-row:span 1;height:220px}
+      .video-showcase{grid-template-columns:1fr 1fr}.vs-item:last-child{display:none}
+      .services-list{grid-template-columns:1fr 1fr}
+      .stats-strip{grid-template-columns:1fr 1fr}
+      .reviews-slide{grid-template-columns:1fr}
+      .gram-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:800px){.calc-wrap{grid-template-columns:1fr}.calc-result{position:static}}
+    @media(max-width:640px){
+      .nav-links{display:none}.hamburger{display:block}
+      nav{padding:.4rem 1.2rem}
+      .nav-logo img{height:70px!important}
+      section{padding:3rem 1.2rem}
+      .hero{padding:0 1.2rem 3.5rem}
+      .hero h1{letter-spacing:-1px}
+      .services-list{grid-template-columns:1fr}
+      .stats-strip{grid-template-columns:1fr 1fr;padding:2.5rem 1.2rem}
+      .form-grid{grid-template-columns:1fr}.fg.full{grid-column:span 1}
+      .footer-top{flex-direction:column}.footer-links{gap:2rem}
+      .footer-bottom{flex-direction:column;text-align:center}
+      .ba-wrap{height:260px}
+      .calc-checks{grid-template-columns:1fr}
+      .floats{bottom:1rem;right:1rem}
+    }
+  </style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- FLOATS -->
+<div class="floats" id="floats">
+  <a href="https://wa.me/17868036784?text=Hi%20C%26R!%20I%27d%20like%20a%20free%20quote." target="_blank" class="float-wa">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    WhatsApp
+  </a>
+  <a href="#quote" class="float-q">✏️ Free Quote</a>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <img src="images/logo.png" alt="C&R General Carpentry" style="height:115px;object-fit:contain;display:block;filter:brightness(0) invert(1) drop-shadow(0 2px 16px rgba(196,147,63,.6));">
+  </a>
+  <div class="nav-links">
+    <a href="#work" data-t="nav-work">Work</a>
+    <a href="#services" data-t="nav-services">Services</a>
+    <a href="#reviews" data-t="nav-reviews">Reviews</a>
+    <a href="tel:+17868036784" class="nav-phone">📞 (786) 803-6784</a>
+    <a href="#quote" class="nav-cta" data-en="Free Quote" data-es="Cotización">Free Quote</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.6rem;">
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">ES</button>
+    <button class="hamburger" onclick="toggleNav()">☰</button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mob" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,10,10,.98);z-index:499;flex-direction:column;align-items:center;justify-content:center;gap:2rem;">
+  <button onclick="toggleNav()" style="position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:var(--white);font-size:1.5rem;cursor:pointer;">✕</button>
+  <a href="#work" onclick="toggleNav()" style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--white);text-decoration:none;">Work</a>
+  <a href="#services" onclick="toggleNav()" style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--white);text-decoration:none;">Services</a>
+  <a href="#reviews" onclick="toggleNav()" style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--white);text-decoration:none;">Reviews</a>
+  <a href="tel:+17868036784" style="font-size:1.1rem;color:var(--gold-lt);font-weight:700;text-decoration:none;">📞 (786) 803-6784</a>
+  <a href="#quote" onclick="toggleNav()" class="btn-gold">Get Free Quote</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-video">
+    <!-- Blurred background layer -->
+  <video id="heroBlur" src="videos/cr-v05.mp4" muted autoplay playsinline preload="auto" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(28px) brightness(0.45);transform:scale(1.08);"></video>
+  <!-- Sharp main video, zoomed out -->
+  <video id="heroVid" src="videos/cr-v05.mp4" muted autoplay playsinline preload="auto" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.72);width:100%;height:100%;object-fit:cover;z-index:1;"></video>
+  <!-- Fallback play button -->
+  <div id="heroPlay" onclick="this.style.display='none';_hv.play();document.getElementById('heroBlur').play();" style="display:none;position:absolute;inset:0;z-index:4;align-items:center;justify-content:center;cursor:pointer;">
+    <div style="width:80px;height:80px;border-radius:50%;background:rgba(196,147,63,.9);display:flex;align-items:center;justify-content:center;font-size:2rem;">▶</div>
+  </div>
+  </div>
+  <!-- Gradient overlay sits above videos, below content -->
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(10,10,10,1) 0%,rgba(10,10,10,.5) 45%,rgba(10,10,10,.1) 100%);z-index:2;pointer-events:none;"></div>
+  <div class="hero-content">
+    <div class="hero-tag" data-en="⭐ 15+ Years Serving Miami" data-es="⭐ 15+ Años Sirviendo a Miami">⭐ 15+ Years Serving Miami</div>
+    <h1 data-en="Built by<br>Hand. Built<br>to <em>Last.</em>" data-es="Construido a<br>Mano. Hecho<br>para <em>Durar.</em>">Built by<br>Hand. Built<br>to <em>Last.</em></h1>
+    <p class="hero-sub" data-en="Custom kitchens, cabinets, closets & TV mounts — crafted for your home, your vision, your life. 15+ years serving Miami." data-es="Cocinas, gabinetes, closets y montajes de TV — construidos para tu hogar, tu visión, tu vida. Más de 15 años sirviendo a Miami.">Custom kitchens, cabinets, closets & TV mounts — crafted for your home, your vision, your life. 15+ years serving Miami.</p>
+    <div class="hero-actions">
+      <a href="#quote" class="btn-gold" data-en="Get Your Free Quote →" data-es="Obtén Tu Cotización →">Get Your Free Quote →</a>
+      <a href="tel:+17868036784" class="btn-outline">📞 (786) 803-6784</a>
+    </div>
+  </div>
+  <div class="hero-scroll-hint">scroll</div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">Custom Kitchens</span>
+    <span class="ticker-item">Custom Cabinetry</span>
+    <span class="ticker-item">Walk-In Closets</span>
+    <span class="ticker-item">TV Wall Mounts</span>
+    <span class="ticker-item">Bathroom Vanities</span>
+    <span class="ticker-item">Miami FL</span>
+    <span class="ticker-item">Free Quotes</span>
+    <span class="ticker-item">Custom Kitchens</span>
+    <span class="ticker-item">Custom Cabinetry</span>
+    <span class="ticker-item">Walk-In Closets</span>
+    <span class="ticker-item">TV Wall Mounts</span>
+    <span class="ticker-item">Bathroom Vanities</span>
+    <span class="ticker-item">Miami FL</span>
+    <span class="ticker-item">Free Quotes</span>
+  </div>
+</div>
+
+<!-- WORK GRID -->
+<section id="work">
+  <div class="container">
+    <p class="s-label reveal" data-t="work-label">Our Work</p>
+    <h2 class="s-title reveal reveal-d1" style="color:var(--white)" data-t="work-title">Built in Miami.<br>Built to Impress.</h2>
+  </div>
+  <div class="work-grid container reveal reveal-d2">
+    <div class="wg-item wg-1">
+      <img src="images/cr-05.jpg" alt="Custom modern kitchen by C&R General Carpentry Miami">
+      <div class="wg-overlay"><span class="wg-label">Modern Kitchen — Miami</span></div>
+    </div>
+    <div class="wg-item wg-2">
+      <img src="images/cr-09.jpg" alt="Custom kitchen installation C&R Miami">
+      <div class="wg-overlay"><span class="wg-label">Kitchen Build</span></div>
+    </div>
+    <div class="wg-item wg-3">
+      <img src="images/cr-12.jpg" alt="Custom cabinetry C&R Miami">
+      <div class="wg-overlay"><span class="wg-label">Custom Cabinetry</span></div>
+    </div>
+    <div class="wg-item wg-4">
+      <img src="images/cr-07.jpg" alt="Kitchen craftsmanship C&R Miami">
+      <div class="wg-overlay"><span class="wg-label">Kitchen Renovation</span></div>
+    </div>
+    <div class="wg-item wg-5">
+      <img src="images/cr-10.jpg" alt="Floor to ceiling cabinetry C&R Miami">
+      <div class="wg-overlay"><span class="wg-label">Floor-to-Ceiling Build</span></div>
+    </div>
+    <div class="wg-item wg-6">
+      <img src="images/cr-11.jpg" alt="Custom kitchen design C&R Miami">
+      <div class="wg-overlay"><span class="wg-label">Full Kitchen Design</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO SHOWCASE -->
+<section id="videos" style="padding:0">
+  <div class="video-showcase">
+    <div class="vs-item">
+      <video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v01.mp4" type="video/mp4"></video>
+      <div class="vs-caption">Wall Unit Build</div>
+    </div>
+    <div class="vs-item">
+      <video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v05.mp4" type="video/mp4"></video>
+      <div class="vs-caption">Modern Kitchen</div>
+    </div>
+    <div class="vs-item">
+      <video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v06.mp4" type="video/mp4"></video>
+      <div class="vs-caption">Kitchen Renovation</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="container">
+    <p class="s-label reveal" data-t="svc-label">What We Do</p>
+    <h2 class="s-title reveal reveal-d1" data-t="svc-title">If It's Wood,<br>We Build It.</h2>
+    <div class="services-list">
+      <div class="svc reveal reveal-d1">
+        <div class="svc-num">01</div>
+        <div class="svc-name">Custom Kitchens</div>
+        <div class="svc-desc">Full builds and renovations — cabinets, islands, countertops. The kitchen of your dreams.</div>
+        <span class="svc-tag">Most Popular</span>
+      </div>
+      <div class="svc reveal reveal-d2">
+        <div class="svc-num">02</div>
+        <div class="svc-name">Custom Cabinetry</div>
+        <div class="svc-desc">Built-in cabinets for every room, fully customized to your space.</div>
+        <span class="svc-tag">Fully Custom</span>
+      </div>
+      <div class="svc reveal reveal-d3">
+        <div class="svc-num">03</div>
+        <div class="svc-name">Custom Closets</div>
+        <div class="svc-desc">Walk-ins, organizers, built-in storage — your wardrobe, your way.</div>
+        <span class="svc-tag">Made to Fit</span>
+      </div>
+      <div class="svc reveal reveal-d1">
+        <div class="svc-num">04</div>
+        <div class="svc-name">TV Mounts & Media Centers</div>
+        <div class="svc-desc">Cable-free installs, custom shelving, hidden wiring. Clean finish every time.</div>
+        <span class="svc-tag">Most Requested</span>
+      </div>
+      <div class="svc reveal reveal-d2">
+        <div class="svc-num">05</div>
+        <div class="svc-name">Bathroom Vanities</div>
+        <div class="svc-desc">Custom vanities built to your vision — not a showroom model.</div>
+        <span class="svc-tag">Custom Built</span>
+      </div>
+      <div class="svc reveal reveal-d3">
+        <div class="svc-num">06</div>
+        <div class="svc-name">General Carpentry</div>
+        <div class="svc-desc">Repairs, framing, decks — any carpentry job, done right.</div>
+        <span class="svc-tag">All Projects</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="reveal"><div class="stat-num" data-count="15" data-suffix="+">15+</div><div class="stat-lbl" data-en="Years Experience" data-es="Años de Experiencia">Years Experience</div></div>
+  <div class="reveal reveal-d1"><div class="stat-num" data-count="200" data-suffix="+">200+</div><div class="stat-lbl">Projects Completed</div></div>
+  <div class="reveal reveal-d2"><div class="stat-num">5★</div><div class="stat-lbl">Average Rating</div></div>
+  <div class="reveal reveal-d3"><div class="stat-num">Free</div><div class="stat-lbl">In-Home Consultation</div></div>
+</div>
+
+<!-- COST CALCULATOR -->
+<section id="calc">
+  <div class="container">
+    <p class="s-label reveal">Project Estimator</p>
+    <h2 class="s-title reveal reveal-d1" style="color:var(--white)">How Much Will<br>Your Project Cost?</h2>
+    <div class="calc-wrap reveal reveal-d2">
+
+      <!-- LEFT: INPUTS -->
+      <div class="calc-left">
+
+        <div class="calc-group">
+          <label>Project Type</label>
+          <div class="calc-pills" id="cp-project">
+            <button class="calc-pill on" data-val="kitchen" onclick="setPill('project',this)">🍳 Kitchen</button>
+            <button class="calc-pill" data-val="cabinets" onclick="setPill('project',this)">🪞 Cabinets</button>
+            <button class="calc-pill" data-val="closets" onclick="setPill('project',this)">👔 Closets</button>
+            <button class="calc-pill" data-val="tv" onclick="setPill('project',this)">📺 TV Mount</button>
+            <button class="calc-pill" data-val="vanity" onclick="setPill('project',this)">🛁 Vanity</button>
+            <button class="calc-pill" data-val="general" onclick="setPill('project',this)">🔨 General</button>
+          </div>
+        </div>
+
+        <div class="calc-group">
+          <label>Material / Finish</label>
+          <div class="calc-pills" id="cp-material">
+            <button class="calc-pill on" data-val="standard" onclick="setPill('material',this)">Standard</button>
+            <button class="calc-pill" data-val="premium" onclick="setPill('material',this)">Premium</button>
+            <button class="calc-pill" data-val="luxury" onclick="setPill('material',this)">Luxury</button>
+          </div>
+        </div>
+
+        <div class="calc-group" id="area-group">
+          <label>Area / Size — <span id="sqft-val">150 sq ft</span></label>
+          <input type="range" class="calc-slider" id="area-slider" min="50" max="600" value="150" step="10" oninput="updateCalc()">
+          <div style="display:flex;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,.25);margin-top:.2rem"><span>50 sq ft</span><span>600 sq ft</span></div>
+        </div>
+
+        <div class="calc-group">
+          <label>Add-Ons</label>
+          <div class="calc-checks">
+            <label class="calc-check"><input type="checkbox" data-cost="3500" onchange="updateCalc()"><span>Custom Island (+$3,500)</span></label>
+            <label class="calc-check"><input type="checkbox" data-cost="900" onchange="updateCalc()"><span>Under-Cabinet Lighting (+$900)</span></label>
+            <label class="calc-check"><input type="checkbox" data-cost="700" onchange="updateCalc()"><span>Soft-Close Hardware (+$700)</span></label>
+            <label class="calc-check"><input type="checkbox" data-cost="600" onchange="updateCalc()"><span>Custom Paint Finish (+$600)</span></label>
+            <label class="calc-check"><input type="checkbox" data-cost="1200" onchange="updateCalc()"><span>Demo / Removal (+$1,200)</span></label>
+            <label class="calc-check"><input type="checkbox" data-cost="800" onchange="updateCalc()"><span>Hidden Cable Mgmt (+$800)</span></label>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: RESULT -->
+      <div class="calc-result">
+        <div class="calc-result-label">Estimated Range</div>
+        <div class="calc-price" id="calc-price">$8,500 – $12,000</div>
+        <p style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:1rem;">Based on your selections</p>
+        <div class="calc-breakdown" id="calc-breakdown">
+          <div class="calc-line"><span>Base project</span><span id="cb-base">—</span></div>
+          <div class="calc-line"><span>Material multiplier</span><span id="cb-mat">—</span></div>
+          <div class="calc-line"><span>Area factor</span><span id="cb-area">—</span></div>
+          <div class="calc-line"><span>Add-ons</span><span id="cb-addons">$0</span></div>
+          <div class="calc-line total"><span>Estimated Total</span><span id="cb-total">—</span></div>
+        </div>
+        <p class="calc-note">This is a rough estimate only. Actual pricing depends on site conditions, specific materials chosen, and project complexity. Get your real quote — it's free.</p>
+        <a href="#quote" class="calc-cta">Get My Exact Free Quote →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- BEFORE / AFTER -->
+<section id="ba">
+  <div class="container">
+    <p class="s-label reveal" style="text-align:center">The Transformation</p>
+    <h2 class="s-title reveal reveal-d1" style="color:var(--white);text-align:center">← Drag to See the Difference</h2>
+    <div class="ba-wrap reveal reveal-d2" id="baSlider">
+      <div class="ba-before"><img src="https://images.unsplash.com/photo-1556909212-d5b604d0c90d?w=1400&q=85" alt="Before kitchen renovation"></div>
+      <div class="ba-after" id="baAfter"><img src="images/cr-05.jpg" alt="After C&R kitchen renovation Miami"></div>
+      <div class="ba-handle" id="baHandle"></div>
+      <span class="ba-label b">Before</span>
+      <span class="ba-label a">After — C&R</span>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="container">
+    <p class="s-label reveal" data-t="rv-label">Happy Clients</p>
+    <h2 class="s-title reveal reveal-d1" data-t="rv-title">What Miami<br>Homeowners Say</h2>
+    <div class="reviews-carousel">
+      <div class="reviews-track" id="rvTrack">
+        <div class="reviews-slide">
+          <div class="rv reveal reveal-d1">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"C&R transformed our kitchen completely. The cabinets are beautiful and they worked within our budget to make it happen."</p>
+            <div class="rv-author"><div class="rv-avatar">M</div><div><div class="rv-name">Maria G.</div><div class="rv-loc">Kendall, Miami</div></div></div>
+          </div>
+          <div class="rv reveal reveal-d2">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"Incredible attention to detail. Our custom built-ins look like something out of a magazine. Professional from start to finish."</p>
+            <div class="rv-author"><div class="rv-avatar">J</div><div><div class="rv-name">James R.</div><div class="rv-loc">Doral, Miami</div></div></div>
+          </div>
+          <div class="rv reveal reveal-d3">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"Got 3 quotes — C&R had the best price, best communication, and finished faster than promised. My vanity is stunning."</p>
+            <div class="rv-author"><div class="rv-avatar">A</div><div><div class="rv-name">Ana P.</div><div class="rv-loc">Hialeah, Miami</div></div></div>
+          </div>
+        </div>
+        <div class="reviews-slide">
+          <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"TV wall mount and full media center — zero cables visible. Family loves it. Will definitely call them again."</p>
+            <div class="rv-author"><div class="rv-avatar">R</div><div><div class="rv-name">Roberto S.</div><div class="rv-loc">Brickell, Miami</div></div></div>
+          </div>
+          <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"Built us a custom walk-in closet. Every shelf exactly where we wanted it. Better than anything from a store."</p>
+            <div class="rv-author"><div class="rv-avatar">L</div><div><div class="rv-name">Laura M.</div><div class="rv-loc">Coral Gables, Miami</div></div></div>
+          </div>
+            <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"Best investment in our home. Custom kitchen cabinets and an island — the craftsmanship is on another level."</p>
+            <div class="rv-author"><div class="rv-avatar">C</div><div><div class="rv-name">Carlos V.</div><div class="rv-loc">Doral, Miami</div></div></div>
+          </div>
+        </div>
+        <div class="reviews-slide">
+          <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"I've worked with many contractors in Miami. C&R is on a different level — on time, on budget, and the quality is exceptional. My walk-in closet is a dream."</p>
+            <div class="rv-author"><div class="rv-avatar">S</div><div><div class="rv-name">Sandra M.</div><div class="rv-loc">Aventura, Miami</div></div></div>
+          </div>
+          <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"Transformaron nuestra cocina completamente. El equipo fue profesional, limpio y el resultado superó todas nuestras expectativas. 100% recomendados."</p>
+            <div class="rv-author"><div class="rv-avatar">D</div><div><div class="rv-name">Diana R.</div><div class="rv-loc">Hialeah, Miami</div></div></div>
+          </div>
+          <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"From the first call to the final walkthrough, C&R was flawless. They built our entire kitchen from scratch — 15 years of experience shows in every detail."</p>
+            <div class="rv-author"><div class="rv-avatar">M</div><div><div class="rv-name">Michael T.</div><div class="rv-loc">Coconut Grove, Miami</div></div></div>
+          </div>
+        </div>
+        <div class="reviews-slide">
+          <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"Hicieron los gabinetes de toda la cocina y el resultado fue espectacular. Rápidos, limpios y muy profesionales. ¡Los llamo de nuevo sin duda!"</p>
+            <div class="rv-author"><div class="rv-avatar">Y</div><div><div class="rv-name">Yolanda P.</div><div class="rv-loc">Kendall, Miami</div></div></div>
+          </div>
+          <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"Media center came out insane. Hidden wires, custom shelves, perfectly fitted TV mount. My living room looks like a showroom now."</p>
+            <div class="rv-author"><div class="rv-avatar">K</div><div><div class="rv-name">Kevin B.</div><div class="rv-loc">Brickell, Miami</div></div></div>
+          </div>
+          <div class="rv">
+            <div class="rv-stars">★★★★★</div>
+            <p class="rv-text">"Llevamos 15 años buscando un carpintero de confianza. C&R es exactamente eso. Trabajo impecable, precio justo y terminaron antes de lo prometido."</p>
+            <div class="rv-author"><div class="rv-avatar">F</div><div><div class="rv-name">Fernando G.</div><div class="rv-loc">Doral, Miami</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="rv-dots" id="rvDots">
+      <button class="rv-dot on" onclick="goRv(0)"></button>
+      <button class="rv-dot" onclick="goRv(1)"></button>
+      <button class="rv-dot" onclick="goRv(2)"></button>
+      <button class="rv-dot" onclick="goRv(3)"></button>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM FEED -->
+<section id="gram">
+  <div class="container">
+    <p class="s-label reveal" style="text-align:center" data-t="gram-label">Follow Our Work</p>
+    <h2 class="s-title reveal reveal-d1" style="text-align:center;color:var(--white)">@CRGeneralCarpentry</h2>
+    <div class="gram-grid reveal reveal-d2">
+      <div class="gram-item"><video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v01.mp4" type="video/mp4"></video></div>
+      <div class="gram-item"><video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v02.mp4" type="video/mp4"></video></div>
+      <div class="gram-item"><video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v03.mp4" type="video/mp4"></video></div>
+      <div class="gram-item"><video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v04.mp4" type="video/mp4"></video></div>
+      <div class="gram-item"><video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v05.mp4" type="video/mp4"></video></div>
+      <div class="gram-item"><video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v06.mp4" type="video/mp4"></video></div>
+      <div class="gram-item"><video muted loop playsinline preload="metadata" class="scroll-vid"><source src="videos/cr-v07.mp4" type="video/mp4"></video></div>
+      <a href="https://www.instagram.com/CRGeneralCarpentry" target="_blank" class="gram-item">
+        <img src="images/cr-08.jpg" alt="C&R General Carpentry Miami Instagram">
+        <div class="gram-more"><span style="font-size:1.5rem">+</span><span>See More</span></div>
+      </a>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <a href="https://www.instagram.com/CRGeneralCarpentry" target="_blank" class="btn-outline" style="display:inline-block;font-size:.82rem;padding:.7rem 1.8rem;">Follow @CRGeneralCarpentry →</a>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE FORM -->
+<section id="quote">
+  <div class="quote-wrap">
+    <p class="s-label reveal" style="text-align:center" data-t="q-label">Free Quote</p>
+    <h2 class="s-title reveal reveal-d1" style="text-align:center" data-t="q-title">Start Your Project Today</h2>
+    <p class="reveal reveal-d2" style="text-align:center;color:#666;font-size:.88rem;margin-bottom:0;" data-t="q-sub">We respond within 24 hours. No commitment needed.</p>
+    <form id="qForm" onsubmit="submitForm(event)">
+      <div class="form-grid">
+        <div class="fg"><label>First Name</label><input type="text" name="firstName" placeholder="Maria" required></div>
+        <div class="fg"><label>Last Name</label><input type="text" name="lastName" placeholder="Garcia" required></div>
+        <div class="fg"><label>Phone / WhatsApp</label><input type="tel" name="phone" placeholder="(305) 000-0000" required></div>
+        <div class="fg"><label>Email</label><input type="email" name="email" placeholder="you@email.com"></div>
+        <div class="fg full"><label>Service Needed</label>
+          <select name="service" required>
+            <option value="">Select a service...</option>
+            <option>Custom Kitchen</option>
+            <option>Custom Cabinetry</option>
+            <option>Custom Closets</option>
+            <option>TV Wall Mount / Media Center</option>
+            <option>Bathroom Vanity</option>
+            <option>General Carpentry</option>
+            <option>Multiple / Other</option>
+          </select>
+        </div>
+        <div class="fg full"><label>Tell us about your project (optional)</label><textarea name="details" placeholder="Describe your project, size, timeline..."></textarea></div>
+      </div>
+      <button type="submit" class="submit-btn">Send via WhatsApp →</button>
+      <p class="form-note">Clicking sends your info directly to our WhatsApp. We respond fast.</p>
+      <div id="form-ok">✅ Opening WhatsApp — we'll get back to you shortly!</div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top container">
+    <div>
+      <img src="images/logo.png" alt="C&R General Carpentry" style="height:110px;object-fit:contain;display:block;margin-bottom:.5rem;filter:brightness(0) invert(1) drop-shadow(0 2px 8px rgba(196,147,63,.4));">
+      <div class="footer-slogan">Donde la imaginación y el trabajo se unen a hacer realidad tus sueños</div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h5>Services</h5>
+        <a href="#services">Custom Kitchens</a>
+        <a href="#services">Custom Cabinetry</a>
+        <a href="#services">Closets</a>
+        <a href="#services">TV Mounts</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contact</h5>
+        <a href="tel:+17868036784">📞 (786) 803-6784</a>
+        <a href="https://wa.me/17868036784" target="_blank">💬 WhatsApp</a>
+        <a href="mailto:crgeneralcarpentry@gmail.com">✉️ Email Us</a>
+      </div>
+      <div class="footer-col">
+        <h5>Areas Served</h5>
+        <p>Miami · Coral Gables</p>
+        <p>Doral · Hialeah</p>
+        <p>Kendall · Brickell</p>
+        <p>All Miami-Dade</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom container">
+    <p class="footer-copy">© 2026 C&R General Carpentry Corp · Miami, FL</p>
+    <a href="https://www.instagram.com/CRGeneralCarpentry" target="_blank" class="footer-ig">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="url(#ig)"><defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#833ab4"/><stop offset="50%" stop-color="#fd1d1d"/><stop offset="100%" stop-color="#fcb045"/></linearGradient></defs><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      @CRGeneralCarpentry
+    </a>
+  </div>
+</footer>
+
+<script>
+// ── CURSOR ──────────────────────────────────────────────────────────────────
+const cur = document.getElementById('cur'), curR = document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cur.style.left=mx+'px'; cur.style.top=my+'px'; });
+document.querySelectorAll('a,button').forEach(el => {
+  el.addEventListener('mouseenter', () => curR.classList.add('hov'));
+  el.addEventListener('mouseleave', () => curR.classList.remove('hov'));
+});
+(function loop(){ rx+=(mx-rx)*.1; ry+=(my-ry)*.1; curR.style.left=rx+'px'; curR.style.top=ry+'px'; requestAnimationFrame(loop); })();
+
+// ── HERO VIDEO COMPILATION (full length, auto-advances) ───────────────────────
+const _clips = [
+  'videos/cr-v05.mp4',
+  'videos/cr-new06.mp4',
+  'videos/cr-new01.mp4',
+  'videos/cr-v01.mp4',
+  'videos/cr-new04.mp4',
+  'videos/cr-v03.mp4',
+];
+let _ci = 0;
+const _hv = document.getElementById('heroVid');
+
+const _hb = document.getElementById('heroBlur');
+function _playClip(i) {
+  _hv.src = _clips[i];
+  _hv.muted = true;
+  _hv.play().catch(() => {});
+  _hb.src = _clips[i];
+  _hb.muted = true;
+  _hb.play().catch(() => {});
+}
+
+// When each video ends, play the next one
+_hv.addEventListener('ended', () => {
+  _ci = (_ci + 1) % _clips.length;
+  _playClip(_ci);
+});
+
+// Try autoplay — show play button if browser blocks it
+const _autoplayAttempt = _hv.play();
+if (_autoplayAttempt instanceof Promise) {
+  _autoplayAttempt.catch(() => {
+    document.getElementById('heroPlay').style.display = 'flex';
+  });
+}
+
+// ── LANGUAGE TOGGLE ───────────────────────────────────────────────────────────
+let _lang = localStorage.getItem('cr-lang') || 'en';
+const T = {
+  en: {
+    'nav-work':'Work','nav-services':'Services','nav-reviews':'Reviews','nav-cta':'Free Quote',
+    'hero-tag':'⭐ 15+ Years Serving Miami',
+    'hero-sub':'Custom kitchens, cabinets, closets & TV mounts — crafted for your home, your vision, your life. 15+ years serving Miami.',
+    'hero-cta':'Get Your Free Quote →','hero-cta2':'📞 (786) 803-6784',
+    'ticker':'Custom Kitchens · Custom Cabinetry · Walk-In Closets · TV Wall Mounts · Bathroom Vanities · Miami FL · Free Quotes · ',
+    'work-label':'Our Work','work-title':'Built in Miami.<br>Built to Impress.',
+    'svc-label':'What We Do','svc-title':'If It\'s Wood,<br>We Build It.',
+    's1':'Custom Kitchens','s1d':'Full builds and renovations — cabinets, islands, countertops. The kitchen of your dreams.',
+    's2':'Custom Cabinetry','s2d':'Built-in cabinets for every room, fully customized to your space.',
+    's3':'Custom Closets','s3d':'Walk-ins, organizers, built-in storage — your wardrobe, your way.',
+    's4':'TV Mounts & Media Centers','s4d':'Cable-free installs, custom shelving, hidden wiring. Clean finish every time.',
+    's5':'Bathroom Vanities','s5d':'Custom vanities built to your vision — not a showroom model.',
+    's6':'General Carpentry','s6d':'Repairs, framing, decks — any carpentry job, done right.',
+    'stat1':'Years Experience','stat2':'Projects Completed','stat3':'Average Rating','stat4':'In-Home Consultation',
+    'ba-label':'The Transformation','ba-title':'← Drag to See the Difference',
+    'rv-label':'Happy Clients','rv-title':'What Miami<br>Homeowners Say',
+    'gram-label':'Follow Our Work',
+    'q-label':'Free Quote','q-title':'Start Your Project Today','q-sub':'We respond within 24 hours. No commitment needed.',
+    'f-fn':'First Name','f-ln':'Last Name','f-ph':'Phone / WhatsApp','f-em':'Email','f-svc':'Service Needed','f-det':'Tell us about your project (optional)',
+    'f-submit':'Send via WhatsApp →','f-note':'Clicking sends your info directly to our WhatsApp. We respond fast.',
+    'float-wa':'WhatsApp','float-q':'Free Quote',
+  },
+  es: {
+    'nav-work':'Trabajo','nav-services':'Servicios','nav-reviews':'Reseñas','nav-cta':'Cotización',
+    'hero-tag':'⭐ 15+ Años Sirviendo a Miami',
+    'hero-sub':'Cocinas, gabinetes, closets y montajes de TV — construidos para tu hogar, tu visión, tu vida. Más de 15 años sirviendo a Miami.',
+    'hero-cta':'Obtén Tu Cotización →','hero-cta2':'📞 (786) 803-6784',
+    'work-label':'Nuestro Trabajo','work-title':'Construido en Miami.<br>Construido para Impresionar.',
+    'svc-label':'Lo Que Hacemos','svc-title':'Si Es Madera,<br>Lo Construimos.',
+    's1':'Cocinas Personalizadas','s1d':'Construcción y renovación completa — gabinetes, islas, encimeras. La cocina de tus sueños.',
+    's2':'Gabinetes a Medida','s2d':'Gabinetes empotrados para cada habitación, totalmente personalizados.',
+    's3':'Closets Personalizados','s3d':'Walk-ins, organizadores, almacenamiento — tu guardarropa, a tu manera.',
+    's4':'Montajes de TV y Centros de Medios','s4d':'Sin cables a la vista, estantes a medida, cableado oculto. Acabado perfecto.',
+    's5':'Vanidades de Baño','s5d':'Vanidades a medida según tu visión — no un modelo de catálogo.',
+    's6':'Carpintería General','s6d':'Reparaciones, marcos, terrazas — cualquier trabajo, bien hecho.',
+    'stat1':'Años de Experiencia','stat2':'Proyectos Completados','stat3':'Calificación Promedio','stat4':'Consulta Gratuita',
+    'ba-label':'La Transformación','ba-title':'← Arrastra para Ver la Diferencia',
+    'rv-label':'Clientes Felices','rv-title':'Lo Que Dicen los<br>Propietarios de Miami',
+    'gram-label':'Síguenos',
+    'q-label':'Cotización Gratis','q-title':'Comienza Tu Proyecto Hoy','q-sub':'Respondemos en 24 horas. Sin compromiso.',
+    'f-fn':'Nombre','f-ln':'Apellido','f-ph':'Teléfono / WhatsApp','f-em':'Correo Electrónico','f-svc':'Servicio','f-det':'Cuéntanos sobre tu proyecto (opcional)',
+    'f-submit':'Enviar por WhatsApp →','f-note':'Al hacer clic, tu info va directo a nuestro WhatsApp. Respondemos rápido.',
+    'float-wa':'WhatsApp','float-q':'Cotización',
+  }
+};
+
+function setLang(lang) {
+  _lang = lang;
+  localStorage.setItem('cr-lang', lang);
+  document.documentElement.lang = lang;
+  document.getElementById('langBtn').textContent = lang === 'en' ? 'ES' : 'EN';
+  document.querySelectorAll('[data-t]').forEach(el => {
+    const k = el.dataset.t;
+    if (T[lang][k]) el.innerHTML = T[lang][k];
+  });
+}
+function toggleLang() { setLang(_lang === 'en' ? 'es' : 'en'); }
+// init
+setLang(_lang);
+
+// ── NAV ─────────────────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('solid', window.scrollY > 60));
+
+// ── MOBILE NAV ──────────────────────────────────────────────────────────────
+function toggleNav() {
+  const m = document.getElementById('mob');
+  m.style.display = m.style.display === 'flex' ? 'none' : 'flex';
+}
+
+// ── REVEAL ON SCROLL ─────────────────────────────────────────────────────────
+const ro = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('on'); }), { threshold:.12 });
+document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+// ── ANIMATED COUNTERS ────────────────────────────────────────────────────────
+const co = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = parseInt(el.dataset.count);
+    if (!target) return;
+    let v = 0;
+    const step = Math.ceil(target / 50);
+    const t = setInterval(() => { v = Math.min(v+step, target); el.textContent = v + (el.dataset.suffix||''); if(v>=target) clearInterval(t); }, 25);
+    co.unobserve(el);
+  });
+}, { threshold:.5 });
+document.querySelectorAll('[data-count]').forEach(el => co.observe(el));
+
+// ── SCROLL-TO-PLAY VIDEOS ────────────────────────────────────────────────────
+const vo = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    const v = e.target;
+    v.muted = true; v.loop = true;
+    if (e.isIntersecting) { const p = v.play(); if(p) p.catch(()=>{}); }
+    else v.pause();
+  });
+}, { threshold:.4 });
+document.querySelectorAll('.scroll-vid').forEach(v => vo.observe(v));
+
+// ── BEFORE / AFTER ────────────────────────────────────────────────────────────
+(function(){
+  const s = document.getElementById('baSlider');
+  const a = document.getElementById('baAfter');
+  const h = document.getElementById('baHandle');
+  if(!s) return;
+  let down = false;
+  function set(x){ const r=s.getBoundingClientRect(), p=Math.min(Math.max(((x-r.left)/r.width)*100,2),98); a.style.clipPath=`inset(0 ${100-p}% 0 0)`; h.style.left=p+'%'; }
+  s.addEventListener('mousedown', e=>{ down=true; set(e.clientX); });
+  s.addEventListener('touchstart', e=>{ down=true; set(e.touches[0].clientX); },{passive:true});
+  window.addEventListener('mousemove', e=>{ if(down) set(e.clientX); });
+  window.addEventListener('touchmove', e=>{ if(down) set(e.touches[0].clientX); },{passive:true});
+  window.addEventListener('mouseup', ()=>down=false);
+  window.addEventListener('touchend', ()=>down=false);
+})();
+
+// ── REVIEWS CAROUSEL ─────────────────────────────────────────────────────────
+let _rv = 0, _rvTotal = 4;
+function goRv(n) {
+  _rv = n;
+  document.getElementById('rvTrack').style.transform = `translateX(-${n*100}%)`;
+  document.querySelectorAll('.rv-dot').forEach((d,i) => d.classList.toggle('on', i===n));
+}
+setInterval(() => goRv((_rv+1)%_rvTotal), 5000);
+
+// ── FORM → WHATSAPP ───────────────────────────────────────────────────────────
+function submitForm(e) {
+  e.preventDefault();
+  const f = e.target;
+  const btn = f.querySelector('.submit-btn');
+  btn.disabled = true; btn.textContent = 'Opening WhatsApp...';
+  let msg = `Hi C&R Carpentry! I'd like a free quote.\n\nName: ${f.firstName.value} ${f.lastName.value}\nPhone: ${f.phone.value}`;
+  if(f.email.value) msg += `\nEmail: ${f.email.value}`;
+  msg += `\nService: ${f.service.value}`;
+  if(f.details.value) msg += `\nDetails: ${f.details.value}`;
+  setTimeout(() => {
+    document.getElementById('form-ok').style.display = 'block';
+    window.open(`https://wa.me/17868036784?text=${encodeURIComponent(msg)}`, '_blank');
+  }, 400);
+}
+
+// ── COST CALCULATOR ───────────────────────────────────────────────────────────
+const BASE = {
+  kitchen:{base:9500,perSqft:45},
+  cabinets:{base:3500,perSqft:30},
+  closets:{base:2200,perSqft:22},
+  tv:{base:1200,perSqft:0},
+  vanity:{base:2800,perSqft:18},
+  general:{base:1500,perSqft:20}
+};
+const MAT = {standard:1,premium:1.55,luxury:2.3};
+let _project='kitchen', _material='standard';
+
+function setPill(group, btn) {
+  document.querySelectorAll(`#cp-${group} .calc-pill`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(group==='project') _project = btn.dataset.val;
+  if(group==='material') _material = btn.dataset.val;
+  // hide area slider for TV mount
+  document.getElementById('area-group').style.display = _project==='tv' ? 'none' : 'flex';
+  updateCalc();
+}
+
+function fmt(n){return '$'+Math.round(n).toLocaleString('en-US')}
+
+function updateCalc(){
+  const p = BASE[_project];
+  const sqft = parseInt(document.getElementById('area-slider').value)||150;
+  document.getElementById('sqft-val').textContent = sqft+' sq ft';
+  const areaFactor = _project==='tv' ? 1 : sqft/100;
+  const base = p.base + p.perSqft * sqft;
+  const withMat = base * MAT[_material];
+  let addons = 0;
+  document.querySelectorAll('.calc-check input').forEach(cb=>{if(cb.checked) addons+=parseInt(cb.dataset.cost)||0;});
+  const total = withMat + addons;
+  const lo = Math.max(total*0.85, 500), hi = total*1.18;
+
+  document.getElementById('calc-price').textContent = fmt(lo)+' – '+fmt(hi);
+  document.getElementById('cb-base').textContent = fmt(p.base);
+  document.getElementById('cb-mat').textContent = MAT[_material]+'×';
+  document.getElementById('cb-area').textContent = _project==='tv' ? '—' : sqft+' sq ft';
+  document.getElementById('cb-addons').textContent = fmt(addons);
+  document.getElementById('cb-total').textContent = fmt(total);
+}
+updateCalc();
+
+// ── SMOOTH SCROLL ─────────────────────────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth',block:'start'}); }
+  });
+});
+
+// ── HIDE FLOATS IN QUOTE ──────────────────────────────────────────────────────
+new IntersectionObserver(entries => {
+  document.getElementById('floats').style.opacity = entries[0].isIntersecting ? '0' : '1';
+}, {threshold:.2}).observe(document.getElementById('quote'));
+</script>
+</body>
+</html>
