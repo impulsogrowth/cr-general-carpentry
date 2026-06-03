@@ -269,20 +269,98 @@ controls.maxPolarAngle = Math.PI/2 - 0.02;
 controls.target.set(0, 1.1, 0);
 controls.update();
 
+// ── PROCEDURAL TEXTURES ───────────────────────────────────────────────────────
+function woodTex(baseHex='#8B6B2E') {
+  const c=document.createElement('canvas'); c.width=512; c.height=512;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle=baseHex; ctx.fillRect(0,0,512,512);
+  // Grain lines
+  for(let i=0;i<120;i++){
+    const y=(i/120)*512+(Math.random()-.5)*6;
+    const alpha=Math.random()*.25+.06;
+    ctx.strokeStyle=`rgba(${Math.random()>.5?'40,20,0':'120,80,20'},${alpha})`;
+    ctx.lineWidth=Math.random()*1.8+.4;
+    ctx.beginPath(); ctx.moveTo(0,y);
+    let cx=0;
+    while(cx<512){ cx+=12+(Math.random()*8);
+      ctx.lineTo(cx,y+Math.sin(cx*.03)*4+(Math.random()-.5)*2); }
+    ctx.stroke();
+  }
+  // Knots
+  for(let k=0;k<3;k++){
+    const kx=Math.random()*512, ky=Math.random()*512;
+    for(let r=18;r>0;r-=3){
+      ctx.strokeStyle=`rgba(40,20,0,${(.18-r*.006)})`;
+      ctx.lineWidth=1; ctx.beginPath();
+      ctx.ellipse(kx,ky,r,r*.6,Math.random(),0,Math.PI*2); ctx.stroke();
+    }
+  }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(2,2); return t;
+}
+
+function marbleTex(baseHex='#E8E4DC') {
+  const c=document.createElement('canvas'); c.width=512; c.height=512;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle=baseHex; ctx.fillRect(0,0,512,512);
+  // Main veins
+  const veins=[
+    {x1:0,y1:120,cx1:200,cy1:80,cx2:300,cy2:200,x2:512,y2:160,alpha:.18,w:2.5},
+    {x1:30,y1:300,cx1:180,cy1:260,cx2:340,cy2:320,x2:512,y2:280,alpha:.12,w:1.5},
+    {x1:100,y1:0,cx1:140,cy1:200,cx2:200,cy2:350,x2:160,y2:512,alpha:.14,w:2},
+    {x1:0,y1:400,cx1:100,cy1:380,cx2:400,cy2:420,x2:512,y2:390,alpha:.08,w:1},
+    {x1:256,y1:0,cx1:240,cy1:180,cx2:280,cy2:300,x2:256,y2:512,alpha:.1,w:1.5},
+  ];
+  veins.forEach(v=>{
+    ctx.strokeStyle=`rgba(160,148,130,${v.alpha})`;
+    ctx.lineWidth=v.w;
+    ctx.beginPath(); ctx.moveTo(v.x1,v.y1);
+    ctx.bezierCurveTo(v.cx1,v.cy1,v.cx2,v.cy2,v.x2,v.y2); ctx.stroke();
+    // Hairline alongside
+    ctx.strokeStyle=`rgba(180,168,148,${v.alpha*.5})`;
+    ctx.lineWidth=.5;
+    ctx.beginPath(); ctx.moveTo(v.x1,v.y1+3);
+    ctx.bezierCurveTo(v.cx1+4,v.cy1+2,v.cx2-4,v.cy2+3,v.x2,v.y2+3); ctx.stroke();
+  });
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(1.5,1.5); return t;
+}
+
+function tileTex() {
+  const c=document.createElement('canvas'); c.width=256; c.height=256;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#C8C0B4'; ctx.fillRect(0,0,256,256);
+  // Grout lines
+  ctx.strokeStyle='rgba(150,140,128,.5)'; ctx.lineWidth=2;
+  for(let i=0;i<=4;i++){ const v=i*64;
+    ctx.beginPath(); ctx.moveTo(v,0); ctx.lineTo(v,256); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,v); ctx.lineTo(256,v); ctx.stroke();
+  }
+  // Subtle tile variation
+  for(let tx=0;tx<4;tx++) for(let ty=0;ty<4;ty++){
+    const lum=(Math.random()-.5)*.06;
+    ctx.fillStyle=`rgba(${lum>0?255:0},${lum>0?255:0},${lum>0?255:0},${Math.abs(lum)})`;
+    ctx.fillRect(tx*64+2,ty*64+2,60,60);
+  }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(6,5); return t;
+}
+
+const woodT   = woodTex();
+const marbleT = marbleTex();
+const tileT   = tileTex();
+
 // ── MATERIALS ─────────────────────────────────────────────────────────────────
 const M = {};
-M.cab     = new THREE.MeshStandardMaterial({ color:0x8B6B2E, roughness:.55, metalness:.0 });
-M.cabEdge = new THREE.MeshStandardMaterial({ color:0x6B4F1E, roughness:.6, metalness:.0 });
-M.ct      = new THREE.MeshStandardMaterial({ color:0xE8E4DC, roughness:.12, metalness:.04 });
-M.floor   = new THREE.MeshStandardMaterial({ color:0xC2BAB0, roughness:.3, metalness:.0 });
+M.cab     = new THREE.MeshStandardMaterial({ map:woodT, roughness:.52, metalness:.0 });
+M.cabEdge = new THREE.MeshStandardMaterial({ map:woodT, roughness:.58, metalness:.0, color:0xC8A060 });
+M.ct      = new THREE.MeshStandardMaterial({ map:marbleT, roughness:.1, metalness:.05 });
+M.floor   = new THREE.MeshStandardMaterial({ map:tileT, roughness:.28, metalness:.0 });
 M.wall    = new THREE.MeshStandardMaterial({ color:0xEDE9E4, roughness:.92, metalness:.0 });
-M.bs      = new THREE.MeshStandardMaterial({ color:0xE2DED8, roughness:.22, metalness:.0 });
-M.steel   = new THREE.MeshStandardMaterial({ color:0xB4BCC4, roughness:.18, metalness:.85 });
-M.hw      = new THREE.MeshStandardMaterial({ color:0x161616, roughness:.28, metalness:.75 });
+M.bs      = new THREE.MeshStandardMaterial({ map:marbleTex('#E4E0DA'), roughness:.18, metalness:.0 });
+M.steel   = new THREE.MeshStandardMaterial({ color:0xB4BCC4, roughness:.18, metalness:.88, envMapIntensity:1 });
+M.hw      = new THREE.MeshStandardMaterial({ color:0x161616, roughness:.25, metalness:.78 });
 M.ceil    = new THREE.MeshStandardMaterial({ color:0xF2F0EE, roughness:.95, metalness:.0 });
-M.glass   = new THREE.MeshStandardMaterial({ color:0x88BBDD, roughness:.05, metalness:.1, transparent:true, opacity:.22 });
-M.led     = new THREE.MeshStandardMaterial({ color:0xFFF8E8, emissive:0xFFF8E8, emissiveIntensity:2.5 });
-M.shade   = new THREE.MeshStandardMaterial({ color:0x111111, roughness:.4, metalness:.6 });
+M.glass   = new THREE.MeshStandardMaterial({ color:0x88BBDD, roughness:.04, metalness:.1, transparent:true, opacity:.22 });
+M.led     = new THREE.MeshStandardMaterial({ color:0xFFFAF0, emissive:0xFFF8E8, emissiveIntensity:4.0 });
+M.shade   = new THREE.MeshStandardMaterial({ color:0x111111, roughness:.4, metalness:.65 });
 
 // ── TRACKING GROUPS by label ──────────────────────────────────────────────────
 const groups = {};
@@ -478,6 +556,54 @@ const pendLights = [];
   pendLights.push(pl);
 });
 
+// Window spotlight — warm shaft from left wall
+const winSpot = new THREE.SpotLight(0xFFF3D4, 2.8, 14, Math.PI/7, 0.55, 1.2);
+winSpot.position.set(-5.5, 3.2, -0.6);
+winSpot.target.position.set(0, 0, -1.5);
+scene.add(winSpot); scene.add(winSpot.target);
+winSpot.castShadow = true;
+winSpot.shadow.mapSize.set(1024,1024);
+
+// Recessed ceiling point lights
+[[-1.8,-2.8],[1.8,-2.8],[-1.8,.4],[1.8,.4],[0,.4],[0,-2.8]].forEach(([lx,lz])=>{
+  const rl = new THREE.PointLight(0xFFF8F0,.7,3.5);
+  rl.position.set(lx, 4.55, lz);
+  scene.add(rl);
+});
+
+// ── DUST PARTICLES ────────────────────────────────────────────────────────────
+const dustCount = 280;
+const dustGeo   = new THREE.BufferGeometry();
+const dustPos   = new Float32Array(dustCount*3);
+const dustVel   = new Float32Array(dustCount*3);
+for(let i=0;i<dustCount;i++){
+  dustPos[i*3]   = (Math.random()-0.5)*9;
+  dustPos[i*3+1] = Math.random()*4.2;
+  dustPos[i*3+2] = (Math.random()-0.5)*7;
+  dustVel[i*3]   = (Math.random()-.5)*.0015;
+  dustVel[i*3+1] = (Math.random()*.0012)+.0003;
+  dustVel[i*3+2] = (Math.random()-.5)*.0015;
+}
+dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos,3));
+const dustMat  = new THREE.PointsMaterial({ color:0xFFEECC, size:.025, transparent:true, opacity:.45, sizeAttenuation:true });
+const dust     = new THREE.Points(dustGeo, dustMat);
+scene.add(dust);
+
+// ── ANIMATED CABINET DOOR ─────────────────────────────────────────────────────
+// One showcase door that opens on click
+const animDoor = new THREE.Mesh(new THREE.BoxGeometry(.44,.62,.015), M.cab.clone());
+animDoor.position.set(-3.6,.44, BWZ-.28);
+animDoor.castShadow = true;
+scene.add(animDoor);
+groups.cabinets.push(animDoor);
+let doorOpen = false;
+// Pivot point offset so it rotates on hinge
+const doorPivot = new THREE.Object3D();
+doorPivot.position.set(-3.6-.22, .44, BWZ-.28);
+scene.add(doorPivot);
+doorPivot.add(animDoor);
+animDoor.position.set(.22, 0, 0);
+
 // ── RAYCASTER ─────────────────────────────────────────────────────────────────
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2(-99,-99);
@@ -595,6 +721,14 @@ canvas.addEventListener('click', e => {
       highlightGroup(key, 0.4);
       showDetail(key);
       hideCard();
+      // Animate demo cabinet door on cabinet click
+      if(key === 'cabinets') {
+        doorOpen = !doorOpen;
+        gsap.to(doorPivot.rotation, {
+          y: doorOpen ? -Math.PI/2 : 0,
+          duration: .8, ease:'power3.inOut'
+        });
+      }
     }
   }
 });
@@ -605,9 +739,13 @@ document.querySelectorAll('.swatch').forEach(sw => {
     document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
     sw.classList.add('active');
     const col = new THREE.Color(sw.dataset.color);
+    const isWood = ['#8B6B2E'].includes(sw.dataset.color);
+    const newTex = isWood ? woodT : null;
     allCabs.forEach(m => {
       m.material = m.material.clone();
-      m.material.color.set(col);
+      m.material.map   = newTex;
+      m.material.color = newTex ? new THREE.Color(1,1,1) : col;
+      m.material.needsUpdate = true;
     });
   });
 });
@@ -652,16 +790,37 @@ function animate() {
     }
   }
 
-  // Gentle pendant sway
   const t = Date.now()*.001;
+
+  // Pendant sway + flicker
   pendLights.forEach((pl,i)=>{
-    pl.position.x = IX + (i-.65)*.65 + Math.sin(t*.6+i)*0.02;
+    pl.position.x = IX + (i-1)*.65 + Math.sin(t*.6+i)*.022;
+    pl.intensity = 1.4 + Math.sin(t*3.1+i*.8)*.06;
   });
 
-  // Auto-rotate when idle > 4s and no panel open
+  // Window spotlight breathe (like clouds passing)
+  winSpot.intensity = 2.8 + Math.sin(t*.2)*.4;
+
+  // Dust particle drift
+  const dp = dustGeo.attributes.position.array;
+  for(let i=0;i<dustCount;i++){
+    dp[i*3]   += dustVel[i*3]   + Math.sin(t*.3+i)*.0004;
+    dp[i*3+1] += dustVel[i*3+1];
+    dp[i*3+2] += dustVel[i*3+2] + Math.cos(t*.4+i)*.0004;
+    // Wrap vertically
+    if(dp[i*3+1]>4.6){ dp[i*3+1]=0; dp[i*3]=(Math.random()-.5)*9; dp[i*3+2]=(Math.random()-.5)*7; }
+    // Wrap horizontally
+    if(Math.abs(dp[i*3])>5) dp[i*3]*=-.8;
+    if(Math.abs(dp[i*3+2])>4) dp[i*3+2]*=-.8;
+  }
+  dustGeo.attributes.position.needsUpdate = true;
+  // Dust opacity pulses near window light
+  dustMat.opacity = .35 + Math.sin(t*.5)*.1;
+
+  // Auto-rotate when idle
   const idle = Date.now()-lastMove > 4000;
   controls.autoRotate = idle && !document.getElementById('detailPanel').classList.contains('show');
-  controls.autoRotateSpeed = 0.4;
+  controls.autoRotateSpeed = 0.38;
 
   controls.update();
   renderer.render(scene, camera);
