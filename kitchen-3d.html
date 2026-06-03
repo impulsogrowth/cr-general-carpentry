@@ -3,560 +3,716 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>3D Kitchen Visualizer — C&R General Carpentry</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<title>C&R General Carpentry Miami | Interactive 3D Kitchen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#C4933F;--gold-lt:#E8B96A;--black:#080808}
-body{background:var(--black);color:white;font-family:'Inter',sans-serif;overflow:hidden;height:100vh}
-#three-canvas{display:block;width:100vw;height:100vh}
+:root{--gold:#C4933F;--gold-lt:#E8B96A;--black:#080808;--glass:rgba(8,8,8,.82)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--black);font-family:'Inter',sans-serif;color:white;cursor:none}
 
-/* UI OVERLAY */
-.ui{position:fixed;inset:0;pointer-events:none;z-index:10}
+canvas{display:block;width:100vw;height:100vh}
 
-/* TOP BAR */
-.topbar{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;background:linear-gradient(to bottom,rgba(8,8,8,.9),transparent);pointer-events:auto}
-.tb-logo{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900}
-.tb-logo span{color:var(--gold)}
-.tb-title{font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.45)}
-.tb-back{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem}
-.tb-back:hover{color:var(--gold)}
+/* CURSOR */
+#cur{width:8px;height:8px;background:white;border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s}
+#cur.hover{width:14px;height:14px;background:var(--gold)}
+#cur-r{width:38px;height:38px;border:1.5px solid rgba(196,147,63,.6);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .35s,height .35s,border-color .3s}
+#cur-r.hover{width:60px;height:60px;border-color:var(--gold)}
+@media(max-width:700px){body{cursor:auto}#cur,#cur-r{display:none}}
 
-/* CONTROLS PANEL */
-.controls{position:fixed;left:2rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:.6rem;pointer-events:auto}
-.ctrl-group{background:rgba(8,8,8,.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.2rem 1rem;min-width:180px}
-.ctrl-label{font-size:.58rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.75rem}
-.color-row{display:flex;gap:.5rem;flex-wrap:wrap}
-.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative}
-.color-swatch:hover{transform:scale(1.15)}
-.color-swatch.active{border-color:white;box-shadow:0 0 0 1px rgba(255,255,255,.3)}
-.ctrl-btn{width:100%;padding:.55rem .8rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:rgba(255,255,255,.7);font-size:.75rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left;display:flex;align-items:center;gap:.5rem}
-.ctrl-btn:hover,.ctrl-btn.active{background:rgba(196,147,63,.12);border-color:rgba(196,147,63,.3);color:var(--gold-lt)}
-.ctrl-slider{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:rgba(255,255,255,.12);outline:none;cursor:pointer;margin-top:.3rem}
-.ctrl-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;padding:1.2rem 2.5rem;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900}
+.nav-logo span{color:var(--gold)}
+.nav-links{display:flex;gap:2rem;align-items:center;list-style:none}
+.nav-links a{font-size:.78rem;font-weight:600;letter-spacing:.06em;color:rgba(255,255,255,.55);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--gold-lt)}
+.nav-cta{padding:.55rem 1.4rem;background:var(--gold);border-radius:6px;color:var(--black)!important;font-weight:700!important;transition:background .2s!important}
+.nav-cta:hover{background:var(--gold-lt)!important}
+.nav-back{font-size:.75rem;color:rgba(255,255,255,.4);text-decoration:none;display:flex;align-items:center;gap:.4rem;transition:color .2s}
+.nav-back:hover{color:var(--gold-lt)}
 
-/* INFO PANEL — bottom right */
-.info{position:fixed;right:2rem;bottom:2rem;background:rgba(8,8,8,.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.2rem 1.4rem;pointer-events:auto;min-width:220px}
-.info-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;margin-bottom:.3rem;color:white}
-.info-sub{font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.9rem}
-.info-specs{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1rem}
-.info-spec{display:flex;justify-content:space-between;font-size:.75rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
-.info-spec:last-child{border-bottom:none}
-.info-spec .sk{color:rgba(255,255,255,.4)}
-.info-spec .sv{font-weight:600;color:var(--gold-lt)}
-.cta-btn{display:block;width:100%;padding:.7rem;background:var(--gold);border:none;border-radius:8px;color:var(--black);font-size:.8rem;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;transition:background .2s}
-.cta-btn:hover{background:var(--gold-lt)}
+/* HOVER INFO CARD — follows mouse */
+#hoverCard{
+  position:fixed;pointer-events:none;z-index:300;
+  background:rgba(8,8,8,.9);backdrop-filter:blur(24px);
+  border:1px solid rgba(196,147,63,.35);border-radius:14px;
+  padding:1rem 1.3rem;min-width:200px;max-width:260px;
+  opacity:0;transform:translateY(10px) scale(.96);
+  transition:opacity .25s ease,transform .25s ease;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+#hoverCard.show{opacity:1;transform:translateY(0) scale(1)}
+#hoverCard .hc-icon{font-size:1.4rem;margin-bottom:.4rem}
+#hoverCard .hc-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;color:white;margin-bottom:.2rem}
+#hoverCard .hc-sub{font-size:.72rem;color:var(--gold-lt);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.5rem}
+#hoverCard .hc-desc{font-size:.78rem;color:rgba(255,255,255,.55);line-height:1.6}
+#hoverCard .hc-cta{display:inline-block;margin-top:.7rem;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid rgba(196,147,63,.4);padding-bottom:.1rem}
+
+/* HERO TITLE — bottom left on load */
+.hero-text{position:fixed;bottom:3rem;left:2.5rem;z-index:200;max-width:520px;pointer-events:none}
+.hero-text .ht-tag{font-size:.65rem;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;display:block;opacity:0}
+.hero-text h1{font-family:'Playfair Display',serif;font-size:clamp(2.2rem,4vw,3.8rem);font-weight:900;line-height:1;letter-spacing:-2px;margin-bottom:.8rem;opacity:0}
+.hero-text h1 em{color:var(--gold-lt);font-style:italic}
+.hero-text p{font-size:.9rem;color:rgba(255,255,255,.5);line-height:1.65;max-width:380px;opacity:0}
+.hero-text .ht-btns{display:flex;gap:.75rem;margin-top:1.2rem;opacity:0}
+.btn-g{padding:.75rem 1.8rem;background:var(--gold);border:none;border-radius:7px;color:var(--black);font-size:.82rem;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:all .2s}
+.btn-g:hover{background:var(--gold-lt);transform:translateY(-2px)}
+.btn-o{padding:.75rem 1.8rem;background:transparent;border:1.5px solid rgba(255,255,255,.2);border-radius:7px;color:white;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:all .2s}
+.btn-o:hover{border-color:rgba(196,147,63,.6);color:var(--gold-lt)}
 
 /* HINT */
-.hint{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);font-size:.7rem;color:rgba(255,255,255,.28);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.6rem;pointer-events:none}
-.hint::before,.hint::after{content:'';width:32px;height:1px;background:rgba(255,255,255,.15)}
+.hint-bar{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);font-size:.65rem;color:rgba(255,255,255,.22);letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;gap:.6rem;pointer-events:none;z-index:200}
+.hint-bar::before,.hint-bar::after{content:'';width:28px;height:1px;background:rgba(255,255,255,.15)}
 
-/* LOADING SCREEN */
-#loading{position:fixed;inset:0;background:var(--black);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem}
-#loading h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900}
-#loading h2 span{color:var(--gold)}
-.load-bar{width:240px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
-.load-fill{height:100%;background:var(--gold);width:0;transition:width .3s}
-#loading p{font-size:.72rem;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase}
+/* COLOR SWITCHER — top right */
+.swatches{position:fixed;top:50%;right:2rem;transform:translateY(-50%);z-index:300;display:flex;flex-direction:column;gap:.5rem;align-items:center}
+.sw-label{font-size:.55rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.3);writing-mode:vertical-rl;margin-bottom:.4rem}
+.swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .25s}
+.swatch:hover{transform:scale(1.2)}
+.swatch.active{border-color:white;box-shadow:0 0 0 1px rgba(255,255,255,.3)}
+
+/* CLICK PANEL — detail view */
+#detailPanel{
+  position:fixed;right:2rem;top:50%;transform:translateY(-50%);
+  width:280px;z-index:300;
+  background:rgba(8,8,8,.88);backdrop-filter:blur(24px);
+  border:1px solid rgba(196,147,63,.3);border-radius:16px;
+  padding:1.5rem;
+  opacity:0;pointer-events:none;
+  transition:opacity .4s ease,transform .4s ease;
+  transform:translateY(-50%) translateX(20px);
+}
+#detailPanel.show{opacity:1;pointer-events:auto;transform:translateY(-50%) translateX(0)}
+#detailPanel .dp-close{position:absolute;top:.8rem;right:.8rem;background:none;border:none;color:rgba(255,255,255,.4);font-size:1rem;cursor:pointer;transition:color .2s}
+#detailPanel .dp-close:hover{color:white}
+#detailPanel .dp-icon{font-size:2rem;margin-bottom:.6rem}
+#detailPanel .dp-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900;margin-bottom:.3rem}
+#detailPanel .dp-tag{font-size:.65rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem}
+#detailPanel .dp-desc{font-size:.8rem;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:1rem}
+#detailPanel .dp-specs{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1.1rem}
+#detailPanel .dp-spec{display:flex;justify-content:space-between;font-size:.75rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+#detailPanel .dp-spec .sk{color:rgba(255,255,255,.4)}
+#detailPanel .dp-spec .sv{font-weight:600;color:var(--gold-lt)}
+#detailPanel .dp-btn{display:block;width:100%;padding:.7rem;background:var(--gold);border:none;border-radius:8px;color:var(--black);font-size:.8rem;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;transition:background .2s}
+#detailPanel .dp-btn:hover{background:var(--gold-lt)}
+
+/* LOADER */
+#loader{position:fixed;inset:0;background:var(--black);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+#loader .l-logo{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;opacity:0}
+#loader .l-logo span{color:var(--gold)}
+.l-bar{width:220px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.l-fill{height:100%;background:var(--gold);width:0;border-radius:2px}
+#loader p{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.3)}
 
 @media(max-width:700px){
-  .controls{left:1rem;transform:translateY(-50%) scale(.85);transform-origin:left center}
-  .info{right:1rem;bottom:5rem;min-width:180px}
+  .swatches{right:.8rem}
+  #detailPanel{width:calc(100vw - 2rem);right:1rem;top:auto;bottom:1rem;transform:none}
+  #detailPanel.show{transform:none}
+  .hero-text{bottom:8rem;left:1.2rem}
+  nav{padding:.8rem 1.2rem}
+  .nav-links{display:none}
 }
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
-<div id="loading">
-  <h2>C<span>&amp;R</span> Kitchen</h2>
-  <div class="load-bar"><div class="load-fill" id="loadFill"></div></div>
-  <p>Building your kitchen...</p>
+<!-- LOADER -->
+<div id="loader">
+  <div class="l-logo" id="lLogo">C<span>&amp;R</span></div>
+  <div class="l-bar"><div class="l-fill" id="lFill"></div></div>
+  <p id="lMsg">Crafting your kitchen...</p>
 </div>
+
+<!-- CURSOR -->
+<div id="cur"></div>
+<div id="cur-r"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">C<span>&amp;R</span> Carpentry</div>
+  <ul class="nav-links">
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#reviews">Reviews</a></li>
+    <li><a href="index.html#calc">Estimate</a></li>
+    <li><a href="index.html#quote" class="nav-cta">Free Quote</a></li>
+  </ul>
+  <a href="index.html" class="nav-back">← Main Site</a>
+</nav>
 
 <!-- CANVAS -->
-<canvas id="three-canvas"></canvas>
+<canvas id="c"></canvas>
 
-<!-- TOP BAR -->
-<div class="topbar">
-  <div class="tb-logo">C<span>&amp;R</span> Carpentry</div>
-  <div class="tb-title">3D Kitchen Visualizer</div>
-  <a href="index.html" class="tb-back">← Back to Site</a>
+<!-- HOVER CARD -->
+<div id="hoverCard">
+  <div class="hc-icon" id="hcIcon">🍳</div>
+  <div class="hc-title" id="hcTitle">Custom Kitchen</div>
+  <div class="hc-sub" id="hcSub">Click to explore</div>
+  <div class="hc-desc" id="hcDesc">Full custom builds from demo to finish.</div>
+  <span class="hc-cta">Click to explore →</span>
 </div>
 
-<!-- LEFT CONTROLS -->
-<div class="controls">
-
-  <div class="ctrl-group">
-    <div class="ctrl-label">Cabinet Color</div>
-    <div class="color-row" id="cabinetColors">
-      <div class="color-swatch active" data-color="#8B6B2E" style="background:#8B6B2E" title="Warm Wood"></div>
-      <div class="color-swatch" data-color="#FFFFFF" style="background:#FFFFFF" title="White"></div>
-      <div class="color-swatch" data-color="#3D4A52" style="background:#3D4A52" title="Slate Grey"></div>
-      <div class="color-swatch" data-color="#1C1C1C" style="background:#1C1C1C;border:1px solid rgba(255,255,255,.2)" title="Matte Black"></div>
-      <div class="color-swatch" data-color="#B8C4BB" style="background:#B8C4BB" title="Sage"></div>
-      <div class="color-swatch" data-color="#C4933F" style="background:#C4933F" title="Gold"></div>
-    </div>
+<!-- HERO TEXT -->
+<div class="hero-text" id="heroText">
+  <span class="ht-tag">Miami's #1 Custom Carpentry</span>
+  <h1>Built by Hand.<br><em>Built to Last.</em></h1>
+  <p>Hover any part of the kitchen to explore our work. Click to see details and pricing.</p>
+  <div class="ht-btns">
+    <a href="index.html#quote" class="btn-g">Get Free Quote →</a>
+    <a href="tel:+17868036784" class="btn-o">📞 (786) 803-6784</a>
   </div>
-
-  <div class="ctrl-group">
-    <div class="ctrl-label">Countertop</div>
-    <div class="color-row" id="counterColors">
-      <div class="color-swatch active" data-color="#E8E4DC" style="background:#E8E4DC" title="White Quartz"></div>
-      <div class="color-swatch" data-color="#2A2A2A" style="background:#2A2A2A" title="Black Granite"></div>
-      <div class="color-swatch" data-color="#C8B89A" style="background:#C8B89A" title="Marble Beige"></div>
-      <div class="color-swatch" data-color="#7A8B7C" style="background:#7A8B7C" title="Green Quartz"></div>
-    </div>
-  </div>
-
-  <div class="ctrl-group">
-    <div class="ctrl-label">View</div>
-    <button class="ctrl-btn active" id="viewFront" onclick="setView('front')">🏠 Front View</button>
-    <button class="ctrl-btn" id="viewSide"  onclick="setView('side')">↔ Side View</button>
-    <button class="ctrl-btn" id="viewTop"   onclick="setView('top')">⬆ Top View</button>
-    <button class="ctrl-btn" id="viewIsland" onclick="setView('island')">🏝 Island Close-Up</button>
-  </div>
-
-  <div class="ctrl-group">
-    <div class="ctrl-label">Lighting</div>
-    <button class="ctrl-btn active" id="lightDay"   onclick="setLight('day')">☀️ Day</button>
-    <button class="ctrl-btn"        id="lightNight" onclick="setLight('night')">🌙 Night / LED</button>
-    <button class="ctrl-btn"        id="lightDrama" onclick="setLight('drama')">🎬 Dramatic</button>
-  </div>
-
 </div>
 
-<!-- INFO PANEL -->
-<div class="info" id="infoPanel">
-  <div class="info-title" id="infoTitle">Modern Kitchen</div>
-  <div class="info-sub">C&R General Carpentry · Miami, FL</div>
-  <div class="info-specs">
-    <div class="info-spec"><span class="sk">Style</span><span class="sv" id="infoStyle">Warm Wood</span></div>
-    <div class="info-spec"><span class="sk">Countertop</span><span class="sv" id="infoCt">White Quartz</span></div>
-    <div class="info-spec"><span class="sk">Features</span><span class="sv">Island + Upper Cabs</span></div>
-    <div class="info-spec"><span class="sk">Est. Range</span><span class="sv">$18,000 – $28,000</span></div>
-  </div>
-  <a href="#quote" class="cta-btn" onclick="window.location.href='index.html#quote'">Get This Quote →</a>
+<!-- COLOR SWATCHES -->
+<div class="swatches">
+  <div class="sw-label">Color</div>
+  <div class="swatch active" data-color="#8B6B2E" style="background:#8B6B2E" title="Warm Wood"></div>
+  <div class="swatch" data-color="#FFFFFF" style="background:#FFFFFF" title="White"></div>
+  <div class="swatch" data-color="#3D4A52" style="background:#3D4A52" title="Slate"></div>
+  <div class="swatch" data-color="#1C1C1C" style="background:#1C1C1C;outline:1px solid rgba(255,255,255,.2)" title="Black"></div>
+  <div class="swatch" data-color="#B8C4BB" style="background:#B8C4BB" title="Sage"></div>
 </div>
 
-<div class="hint">Drag to rotate · Scroll to zoom · Click colors to change</div>
+<!-- DETAIL PANEL -->
+<div id="detailPanel">
+  <button class="dp-close" onclick="closeDetail()">✕</button>
+  <div class="dp-icon" id="dpIcon">🍳</div>
+  <div class="dp-title" id="dpTitle">Custom Kitchens</div>
+  <div class="dp-tag" id="dpTag">C&R General Carpentry</div>
+  <div class="dp-desc" id="dpDesc">Full kitchen builds from demo to finish.</div>
+  <div class="dp-specs" id="dpSpecs"></div>
+  <a href="index.html#quote" class="dp-btn">Get This Quote →</a>
+</div>
+
+<div class="hint-bar" id="hintBar">Hover to explore · Click to discover · Drag to rotate</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script>
-// ── SCENE SETUP ──────────────────────────────────────────────────────────────
-const canvas   = document.getElementById('three-canvas');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
+// ── DATA: what each part shows ────────────────────────────────────────────────
+const INFO = {
+  cabinets: {
+    icon:'🪞', title:'Custom Cabinets', sub:'Base & Upper Units',
+    desc:'Every cabinet built to your exact dimensions. Dovetail joints, solid wood or MDF boxes, any door style you want.',
+    specs:[['Style','Shaker / Flat / Raised'],['Material','Solid Wood or MDF'],['Finish','Paint, Stain, or Gloss'],['Timeline','2–4 weeks']],
+    camPos:[3.5, 2.0, 3.0], camTarget:[-1.0, 1.2, -2.8]
+  },
+  island: {
+    icon:'🏝', title:'Kitchen Island', sub:'With Waterfall Edge',
+    desc:'Custom island with waterfall quartz countertop, undermount sink, and integrated seating. The centerpiece of your kitchen.',
+    specs:[['Size','Custom to your space'],['Edge','Waterfall or standard'],['Seating','2–4 bar stools'],['Includes','Sink + storage']],
+    camPos:[-0.5, 2.5, 3.5], camTarget:[-0.5, 0.9, 0.8]
+  },
+  counter: {
+    icon:'⬜', title:'Quartz Countertops', sub:'Supply & Install',
+    desc:'We source, template, cut, and install premium quartz and marble. One team handles everything — no subcontractors.',
+    specs:[['Material','Quartz or Marble'],['Thickness','2cm or 3cm'],['Edge','Straight, Bevel, Ogee'],['Includes','Backsplash option']],
+    camPos:[0, 3.5, 2.0], camTarget:[0, 0.92, -1.5]
+  },
+  fridge: {
+    icon:'❄️', title:'Appliance Integration', sub:'Built-In Panels',
+    desc:'We design cabinetry around your appliances. Refrigerator surround panels, oven towers, microwave cubbies — fully integrated.',
+    specs:[['Panel Style','Flush or overlay'],['Includes','Side filler panels'],['Works with','Any brand'],['Handles','Matched to cabinets']],
+    camPos:[5.0, 2.2, 2.0], camTarget:[3.4, 1.2, -2.8]
+  },
+  oven: {
+    icon:'🔥', title:'Oven & Microwave Tower', sub:'Built-In Column',
+    desc:'Double oven column with matching microwave above. Surrounded by custom cabinetry for a seamless, high-end look.',
+    specs:[['Height','Full floor to ceiling'],['Ovens','Single or double'],['Access','Soft-close doors'],['Finish','Matches kitchen']],
+    camPos:[4.0, 2.5, 1.5], camTarget:[3.0, 1.0, -2.8]
+  },
+  stools: {
+    icon:'🪑', title:'Full Kitchen Design', sub:'Every Detail Considered',
+    desc:'We design the complete kitchen — layout, flow, seating, lighting. Bring us a blank room and walk out with a showroom.',
+    specs:[['Seating','2–5 bar stools'],['Island Overhang','12–15 inches'],['Clearance','42–48 inch walkways'],['Design','Free with quote']],
+    camPos:[0.0, 1.8, 4.5], camTarget:[-0.5, 0.9, 0.8]
+  },
+  pendants: {
+    icon:'💡', title:'Lighting Design', sub:'Under-Cabinet + Pendants',
+    desc:'Custom pendant lights above the island. Under-cabinet LED strips. Recessed ceiling lights. We wire and install everything.',
+    specs:[['Pendants','3 above island'],['Under-cabinet','LED warm white'],['Ceiling','Recessed 4" cans'],['Dimmable','Yes, all zones']],
+    camPos:[-0.5, 4.5, 2.5], camTarget:[-0.5, 3.4, 0.8]
+  },
+  backsplash: {
+    icon:'🪟', title:'Backsplash Tile', sub:'Supply & Install',
+    desc:'Full backsplash tile supply and installation included. Subway, large-format, or mosaic — we handle the layout, grouting, and seal.',
+    specs:[['Material','Tile or stone slab'],['Install','Full adhesion + grout'],['Coverage','Counter to upper cabs'],['Sealed','Yes, water-resistant']],
+    camPos:[-1.0, 2.5, 0.5], camTarget:[-1.5, 1.5, -3.1]
+  },
+};
+
+// ── SCENE ────────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
-renderer.outputEncoding    = THREE.sRGBEncoding;
-renderer.toneMapping       = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.1;
-renderer.setClearColor(0x0a0a0a);
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+renderer.setClearColor(0x0a0a0c);
 
 const scene  = new THREE.Scene();
-scene.background = new THREE.Color(0x0d0d0f);
-scene.fog = new THREE.FogExp2(0x0d0d0f, 0.04);
+scene.background = new THREE.Color(0x0c0c10);
+scene.fog = new THREE.Fog(0x0c0c10, 10, 22);
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
-camera.position.set(5.5, 3.2, 6.0);
+const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, 0.1, 80);
+camera.position.set(5.8, 3.4, 6.5);
 
 const controls = new THREE.OrbitControls(camera, canvas);
-controls.enableDamping   = true;
-controls.dampingFactor   = 0.06;
-controls.minDistance     = 2;
-controls.maxDistance     = 14;
-controls.maxPolarAngle   = Math.PI / 2 - 0.05;
-controls.target.set(0, 1.2, 0);
+controls.enableDamping = true;
+controls.dampingFactor = 0.055;
+controls.minDistance = 2.5;
+controls.maxDistance = 13;
+controls.maxPolarAngle = Math.PI/2 - 0.02;
+controls.target.set(0, 1.1, 0);
 controls.update();
 
-// ── MATERIALS ────────────────────────────────────────────────────────────────
-const mats = {};
+// ── MATERIALS ─────────────────────────────────────────────────────────────────
+const M = {};
+M.cab     = new THREE.MeshStandardMaterial({ color:0x8B6B2E, roughness:.55, metalness:.0 });
+M.cabEdge = new THREE.MeshStandardMaterial({ color:0x6B4F1E, roughness:.6, metalness:.0 });
+M.ct      = new THREE.MeshStandardMaterial({ color:0xE8E4DC, roughness:.12, metalness:.04 });
+M.floor   = new THREE.MeshStandardMaterial({ color:0xC2BAB0, roughness:.3, metalness:.0 });
+M.wall    = new THREE.MeshStandardMaterial({ color:0xEDE9E4, roughness:.92, metalness:.0 });
+M.bs      = new THREE.MeshStandardMaterial({ color:0xE2DED8, roughness:.22, metalness:.0 });
+M.steel   = new THREE.MeshStandardMaterial({ color:0xB4BCC4, roughness:.18, metalness:.85 });
+M.hw      = new THREE.MeshStandardMaterial({ color:0x161616, roughness:.28, metalness:.75 });
+M.ceil    = new THREE.MeshStandardMaterial({ color:0xF2F0EE, roughness:.95, metalness:.0 });
+M.glass   = new THREE.MeshStandardMaterial({ color:0x88BBDD, roughness:.05, metalness:.1, transparent:true, opacity:.22 });
+M.led     = new THREE.MeshStandardMaterial({ color:0xFFF8E8, emissive:0xFFF8E8, emissiveIntensity:2.5 });
+M.shade   = new THREE.MeshStandardMaterial({ color:0x111111, roughness:.4, metalness:.6 });
 
-function makeMat(color, rough=0.7, metal=0) {
-  return new THREE.MeshStandardMaterial({ color:new THREE.Color(color), roughness:rough, metalness:metal });
-}
+// ── TRACKING GROUPS by label ──────────────────────────────────────────────────
+const groups = {};
+['cabinets','island','counter','fridge','oven','stools','pendants','backsplash'].forEach(k => {
+  groups[k] = [];
+});
 
-// Cabinet wood
-mats.cabinet     = makeMat('#8B6B2E', 0.55, 0.0);
-mats.cabinetEdge = makeMat('#6B4F1E', 0.6,  0.0);
-// Countertop quartz
-mats.counter     = makeMat('#E8E4DC', 0.15, 0.05);
-// Floor
-mats.floor       = makeMat('#C8C0B4', 0.35, 0.0);
-// Wall
-mats.wall        = makeMat('#F0EDEA', 0.9,  0.0);
-// Backsplash tile (lighter marble look)
-mats.backsplash  = makeMat('#E4E0DA', 0.25, 0.0);
-// Stainless steel (fridge, appliances)
-mats.steel       = makeMat('#B0B8C0', 0.2, 0.8);
-// Black hardware
-mats.hardware    = makeMat('#1A1A1A', 0.3, 0.7);
-// Ceiling
-mats.ceiling     = makeMat('#F5F3F0', 0.95, 0.0);
-// Glass (windows)
-mats.glass = new THREE.MeshStandardMaterial({ color:0x88CCEE, roughness:0.05, metalness:0.1, transparent:true, opacity:0.25 });
-// LED strip under-cabinet
-mats.led = new THREE.MeshStandardMaterial({ color:0xFFF5D6, emissive:0xFFF5D6, emissiveIntensity:1.5 });
+// All cabinet meshes (for color switching)
+const allCabs = [];
 
-// ── HELPERS ──────────────────────────────────────────────────────────────────
-function box(w, h, d, mat, x=0, y=0, z=0, rx=0, ry=0, rz=0) {
+// ── MESH FACTORY ──────────────────────────────────────────────────────────────
+function mk(w,h,d,mat,x=0,y=0,z=0,groups_=[]) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat);
   m.position.set(x,y,z);
-  m.rotation.set(rx,ry,rz);
-  m.castShadow    = true;
-  m.receiveShadow = true;
+  m.castShadow = m.receiveShadow = true;
   scene.add(m);
+  groups_.forEach(g => { if(groups[g]) groups[g].push(m); });
   return m;
 }
 
-function handle(x, y, z) {
-  const g = new THREE.BoxGeometry(0.018, 0.12, 0.018);
-  const m = new THREE.Mesh(g, mats.hardware);
-  m.position.set(x, y, z);
+function handle(x,y,z,grp='cabinets') {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(.018,.11,.018), M.hw);
+  m.position.set(x,y,z);
   m.castShadow = true;
   scene.add(m);
+  if(groups[grp]) groups[grp].push(m);
+  return m;
 }
 
-// ── CABINET COLOR ARRAYS ──────────────────────────────────────────────────────
-const cabinetMeshes  = [];
-const counterMeshes  = [];
+// ── ROOM ──────────────────────────────────────────────────────────────────────
+mk(11,.08,9, M.floor,  0,-.04, 0);
+mk(11,4.8,.12, M.wall, 0,2.4,-3.9);  // back wall
+mk(.12,4.8,9,  M.wall,-5.5,2.4,0);   // left wall
+mk(.12,4.8,4.5,M.wall, 5.5,2.4,-1);  // right wall partial
+mk(11,.1, 9,   M.ceil, 0,4.75,0);    // ceiling
 
-// ── ROOM ─────────────────────────────────────────────────────────────────────
-// Floor
-const floor = box(10, 0.08, 8, mats.floor, 0, -0.04, 0);
-floor.receiveShadow = true;
+// Window in left wall
+mk(1.5,1.1,.09,M.glass,-5.46,2.3,-.6);
+mk(1.5,.06,.11,M.wall, -5.5,2.87,-.6);
+mk(1.5,.06,.11,M.wall, -5.5,1.73,-.6);
+mk(.06,1.1,.11,M.wall, -6.26,2.3,-.6);
+mk(.06,1.1,.11,M.wall, -4.74,2.3,-.6);
 
-// Back wall
-const backWall = box(10, 4.5, 0.12, mats.wall, 0, 2.25, -3.5);
-backWall.receiveShadow = true;
-
-// Left wall
-const leftWall = box(0.12, 4.5, 8, mats.wall, -5, 2.25, 0);
-leftWall.receiveShadow = true;
-
-// Right wall (partial — open kitchen feel)
-const rightWall = box(0.12, 4.5, 4, mats.wall, 5, 2.25, -1);
-
-// Ceiling
-const ceiling = box(10, 0.1, 8, mats.ceiling, 0, 4.5, 0);
-
-// ── BASE CABINET FUNCTION ────────────────────────────────────────────────────
-function baseCabinet(x, z, w=0.6, h=0.88, d=0.56) {
-  const c = box(w-0.01, h, d-0.01, mats.cabinet, x, h/2, z);
-  cabinetMeshes.push(c);
-  // Door lines (inset panel look)
-  const door1 = box(w*0.44, h*0.64, 0.015, mats.cabinetEdge, x - w*0.24, h*0.48, z - d/2 + 0.025);
-  const door2 = box(w*0.44, h*0.64, 0.015, mats.cabinetEdge, x + w*0.24, h*0.48, z - d/2 + 0.025);
-  cabinetMeshes.push(door1, door2);
-  // Handles
-  handle(x - w*0.24, h*0.48, z - d/2 + 0.035);
-  handle(x + w*0.24, h*0.48, z - d/2 + 0.035);
-  // Toe kick
-  const kick = box(w, 0.1, d, mats.hardware, x, 0.05, z);
-  return c;
+// ── BASE CABINET BUILDER ──────────────────────────────────────────────────────
+function baseCab(x,z,w=.6) {
+  const c = mk(w-.01,.88,.55, M.cab, x,.44,z, ['cabinets']);
+  allCabs.push(c);
+  const d1 = mk(w*.44,.62,.016, M.cabEdge, x-w*.24,.44,z-.28, ['cabinets']);
+  const d2 = mk(w*.44,.62,.016, M.cabEdge, x+w*.24,.44,z-.28, ['cabinets']);
+  allCabs.push(d1,d2);
+  handle(x-w*.24,.25, z-.29);
+  handle(x+w*.24,.25, z-.29);
+  mk(w,.06,.55, M.hw, x,.03,z, ['cabinets']);
 }
-
-function upperCabinet(x, z, w=0.6, h=0.65, d=0.34, yPos=2.1) {
-  const c = box(w-0.01, h, d-0.01, mats.cabinet, x, yPos + h/2, z);
-  cabinetMeshes.push(c);
-  const door = box(w*0.84, h*0.8, 0.015, mats.cabinetEdge, x, yPos + h/2, z - d/2 + 0.018);
-  cabinetMeshes.push(door);
-  handle(x, yPos + h/2 - h*0.3, z - d/2 + 0.028);
-  return c;
+function upperCab(x,z,w=.6,h=.66,yy=2.12) {
+  const c = mk(w-.01,h,.33, M.cab, x,yy+h/2,z+.08, ['cabinets']);
+  allCabs.push(c);
+  const d = mk(w*.84,h*.8,.015, M.cabEdge, x,yy+h/2,z-.09, ['cabinets']);
+  allCabs.push(d);
+  handle(x, yy+h/2-h*.3, z-.099);
 }
-
-function counter(x, z, w, d=0.62) {
-  const ct = box(w, 0.04, d, mats.counter, x, 0.9, z);
-  counterMeshes.push(ct);
-  // Overhang lip
-  const lip = box(w, 0.025, 0.025, mats.counter, x, 0.878, z - d/2 + 0.012);
-  counterMeshes.push(lip);
+function counter(x,z,w,grp='counter') {
+  const ct = mk(w,.042,.64, M.ct, x,.915,z, [grp]);
+  const lip = mk(w,.026,.024, M.ct, x,.893,z-.32, [grp]);
   return ct;
 }
 
-// ── BACK WALL CABINETS ───────────────────────────────────────────────────────
-const BWZ = -3.1; // back wall Z for cabinets
-const starts = [-3.6, -3.0, -2.4, -1.8, -1.2, -0.6, 0, 0.6, 1.2, 1.8];
-starts.forEach(x => {
-  baseCabinet(x, BWZ);
-  upperCabinet(x, BWZ + 0.11, 0.6, 0.68, 0.34, 2.1);
+// ── BACK WALL RUNS ────────────────────────────────────────────────────────────
+const BWZ = -3.35;
+for (let ix=-3.6; ix<=1.9; ix+=.6) {
+  baseCab(ix, BWZ);
+  upperCab(ix, BWZ+.12);
+}
+counter(-0.85, BWZ+.04, 5.1, 'counter');
+
+// Backsplash
+mk(5.1,.82,.055, M.bs, -.85,1.53,BWZ+.08, ['backsplash']);
+
+// Under-cabinet LED
+mk(4.9,.018,.018, M.led, -.85,2.08,BWZ+.2, ['backsplash']);
+
+// ── LEFT WALL CABS ────────────────────────────────────────────────────────────
+const LWX=-4.88;
+[-2.4,-3.0,-3.6].forEach(z=>{
+  baseCab(LWX+.28,z,.56);
+  upperCab(LWX+.18,z,.34,.66,2.12);
+});
+counter(LWX+.28,-2.95,.56,'counter');
+mk(.56,.82,1.8, M.bs, LWX+.09,1.53,-2.95, ['backsplash']);
+
+// ── PANTRY TOWER ──────────────────────────────────────────────────────────────
+const PX=2.35;
+const pant = mk(.6,2.25,.58, M.cab, PX,1.125,BWZ, ['cabinets']);
+allCabs.push(pant);
+[-.65,-.1,.45].forEach(yo=>{
+  const pd = mk(.52,.66,.018, M.cabEdge, PX,1.125+yo,BWZ-.3, ['cabinets']);
+  allCabs.push(pd);
+  handle(PX, 1.125+yo-.22, BWZ-.31, 'cabinets');
 });
 
-// Counter along back wall
-counter(-1.8, BWZ + 0.03, 6.0);
+// ── FRIDGE ────────────────────────────────────────────────────────────────────
+mk(.84,2.15,.72, M.steel, 3.55,1.075,BWZ+.08, ['fridge']);
+mk(.84,.01,.72,  M.hw,    3.55,1.32, BWZ+.08, ['fridge']);
+mk(.04,.5,.04,   M.hw,    3.1,1.5,  BWZ-.29, ['fridge']);
+mk(.04,.5,.04,   M.hw,    3.1,.9,   BWZ-.29, ['fridge']);
 
-// Backsplash (between upper and lower)
-const bs = box(6.0, 0.78, 0.06, mats.backsplash, -1.8, 1.55, BWZ + 0.06);
+// ── OVEN TOWER ────────────────────────────────────────────────────────────────
+mk(.58,.6,.54, M.steel, 3.02,.5, BWZ+.03, ['oven']);
+mk(.52,.52,.02,M.hw,    3.02,.5, BWZ-.27, ['oven']);
+mk(.58,.36,.42,M.steel, 3.02,1.22,BWZ+.09, ['oven']);
+mk(.52,.3,.02, M.hw,    3.02,1.22,BWZ-.12, ['oven']);
+mk(.34,.022,.022,M.steel,3.02,.77,BWZ-.275,['oven']);
+mk(.34,.022,.022,M.steel,3.02,1.4,BWZ-.135,['oven']);
 
-// Under-cabinet LED strip
-const led = box(5.8, 0.02, 0.02, mats.led, -1.8, 2.06, BWZ + 0.2);
+// ── ISLAND ────────────────────────────────────────────────────────────────────
+const IX=-.5, IZ=.85, IW=2.4, ID=.98;
+for (let x=-0.9; x<=0.9; x+=.6) {
+  const ic = mk(.57,.88,ID-.02, M.cab, IX+x,.44,IZ, ['island']);
+  allCabs.push(ic);
+  const da = mk(.5,.62,.016, M.cabEdge, IX+x,.44,IZ-ID/2+.018, ['island']);
+  const db = mk(.5,.62,.016, M.cabEdge, IX+x,.44,IZ+ID/2-.018, ['island']);
+  allCabs.push(da,db);
+  handle(IX+x,.25,IZ-ID/2+.028,'island');
+  handle(IX+x,.25,IZ+ID/2-.028,'island');
+}
+// Waterfall countertop
+mk(IW,.048,ID+.1, M.ct, IX,.918,IZ, ['island','counter']);
+mk(.048,.92,ID+.1,M.ct, IX-IW/2-.024,.46,IZ, ['island','counter']);
+mk(.048,.92,ID+.1,M.ct, IX+IW/2+.024,.46,IZ, ['island','counter']);
 
-// ── LEFT WALL CABINETS ───────────────────────────────────────────────────────
-const LWX = -4.4;
-[-2.4, -3.0, -3.6].forEach(z => {
-  baseCabinet(LWX + 0.28, z, 0.56, 0.88, 0.56);
-  upperCabinet(LWX + 0.17, z, 0.34, 0.65, 0.34, 2.1);
+// Sink basin
+mk(.52,.022,.38,M.steel,IX-.7,.925,IZ,['island','counter']);
+mk(.04,.04,.04,M.steel,IX-.7,.96,IZ-.14,['island']);
+mk(.04,.28,.04,M.steel,IX-.7,1.08,IZ-.14,['island']);
+mk(.2,.04,.04, M.steel,IX-.58,1.19,IZ-.14,['island']);
+
+// ── BAR STOOLS ────────────────────────────────────────────────────────────────
+[-0.8,0.0,0.8].forEach(sx=>{
+  const sy = IZ+ID/2+.22;
+  mk(.34,.04,.34,M.hw,   IX+sx,.82,sy, ['stools']);
+  mk(.026,.82,.026,M.hw, IX+sx-.12,.41,sy-.1,['stools']);
+  mk(.026,.82,.026,M.hw, IX+sx+.12,.41,sy-.1,['stools']);
+  mk(.026,.82,.026,M.hw, IX+sx-.12,.41,sy+.1,['stools']);
+  mk(.026,.82,.026,M.hw, IX+sx+.12,.41,sy+.1,['stools']);
+  mk(.28,.024,.024,M.hw, IX+sx,.44,sy,['stools']);
 });
-counter(LWX + 0.28 - 0.0, -2.95, 0.56, 0.58);
-const lbs = box(0.56, 0.78, 1.8, mats.backsplash, LWX + 0.08, 1.55, -2.95);
 
-// ── PANTRY TOWER (tall unit right side of back wall) ─────────────────────────
-const panx = 2.4;
-const pantry = box(0.6, 2.2, 0.58, mats.cabinet, panx, 1.1, BWZ);
-cabinetMeshes.push(pantry);
-// 3 doors
-[-0.62,-0.15,0.32].forEach(yo => {
-  const d2 = box(0.52, 0.64, 0.02, mats.cabinetEdge, panx, 1.1 + yo, BWZ - 0.3);
-  cabinetMeshes.push(d2);
-  handle(panx, 1.1 + yo - 0.22, BWZ - 0.31);
+// ── PENDANTS ──────────────────────────────────────────────────────────────────
+[-.65,0,.65].forEach(px=>{
+  mk(.016,.65,.016, M.hw,    IX+px,3.75,IZ-.12, ['pendants']);
+  const shade = new THREE.Mesh(
+    new THREE.CylinderGeometry(.04,.13,.16,16), M.shade);
+  shade.position.set(IX+px,3.41,IZ-.12);
+  shade.castShadow = true;
+  scene.add(shade);
+  groups.pendants.push(shade);
+  // Bulb glow
+  const bulb = new THREE.Mesh(
+    new THREE.SphereGeometry(.04,8,8), M.led);
+  bulb.position.set(IX+px,3.5,IZ-.12);
+  scene.add(bulb);
+  groups.pendants.push(bulb);
 });
 
-// ── REFRIGERATOR ─────────────────────────────────────────────────────────────
-const fridgeX = 3.5;
-const fridge = box(0.82, 2.1, 0.72, mats.steel, fridgeX, 1.05, BWZ + 0.07);
-// Handle
-const fh1 = box(0.04, 0.5, 0.04, mats.hardware, fridgeX - 0.44, 1.5, BWZ - 0.29);
-const fh2 = box(0.04, 0.5, 0.04, mats.hardware, fridgeX - 0.44, 0.9, BWZ - 0.29);
-// Fridge line
-const fline = box(0.82, 0.01, 0.72, mats.hardware, fridgeX, 1.3, BWZ + 0.07);
+// ── RECESSED LIGHTS ───────────────────────────────────────────────────────────
+[[-1.8,-2.8],[1.8,-2.8],[-1.8,.4],[1.8,.4],[0,.4],[0,-2.8]].forEach(([lx,lz])=>{
+  mk(.16,.04,.16, M.hw, lx,4.7,lz);
+});
 
-// ── BUILT-IN OVEN (in back wall cabinet run) ─────────────────────────────────
-const ovenX = 3.0;
-const oven = box(0.58, 0.58, 0.55, mats.steel, ovenX, 0.5, BWZ + 0.02);
-const ovenDoor = box(0.52, 0.5, 0.03, mats.hardware, ovenX, 0.5, BWZ - 0.25);
-const microwave = box(0.58, 0.35, 0.4, mats.steel, ovenX, 1.22, BWZ + 0.07);
-const mwDoor = box(0.52, 0.3, 0.03, mats.hardware, ovenX, 1.22, BWZ - 0.13);
-// Handles
-box(0.35, 0.025, 0.025, mats.steel, ovenX, 0.75, BWZ - 0.265);
-box(0.35, 0.025, 0.025, mats.steel, ovenX, 1.4,  BWZ - 0.145);
+// ── LIGHTS ────────────────────────────────────────────────────────────────────
+const aLight = new THREE.AmbientLight(0xFFF5E8,.55);
+scene.add(aLight);
 
-// ── ISLAND ───────────────────────────────────────────────────────────────────
-const islandX = -0.5;
-const islandZ = 0.8;
-const islandW = 2.4;
-const islandD = 1.0;
+const sun = new THREE.DirectionalLight(0xFFEDD5,1.5);
+sun.position.set(4,8,5);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-9; sun.shadow.camera.right=9;
+sun.shadow.camera.top=9;   sun.shadow.camera.bottom=-9;
+sun.shadow.camera.near=.5; sun.shadow.camera.far=28;
+sun.shadow.bias=-.0008;
+scene.add(sun);
 
-// Island cabinets — both sides
-for (let ix = -0.9; ix <= 0.9; ix += 0.6) {
-  const ic = box(0.58, 0.88, islandD - 0.02, mats.cabinet, islandX + ix, 0.44, islandZ);
-  cabinetMeshes.push(ic);
-  // Doors on both sides
-  const idA = box(0.5, 0.64, 0.015, mats.cabinetEdge, islandX + ix, 0.44, islandZ - islandD/2 + 0.018);
-  const idB = box(0.5, 0.64, 0.015, mats.cabinetEdge, islandX + ix, 0.44, islandZ + islandD/2 - 0.018);
-  cabinetMeshes.push(idA, idB);
-  handle(islandX + ix, 0.25, islandZ - islandD/2 + 0.028);
-  handle(islandX + ix, 0.25, islandZ + islandD/2 - 0.028);
+const fill = new THREE.PointLight(0xFFF8F0,.9,14);
+fill.position.set(0,4.5,0);
+scene.add(fill);
+
+const pendLights = [];
+[-.65,0,.65].forEach(px=>{
+  const pl = new THREE.PointLight(0xFFEE88,1.4,4);
+  pl.position.set(IX+px,3.4,IZ-.12);
+  scene.add(pl);
+  pendLights.push(pl);
+});
+
+// ── RAYCASTER ─────────────────────────────────────────────────────────────────
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2(-99,-99);
+
+// Build flat lookup: mesh → group key
+const meshToGroup = new Map();
+Object.entries(groups).forEach(([key,arr])=>{
+  arr.forEach(m => meshToGroup.set(m, key));
+});
+
+// Emissive highlight system
+let hoveredGroup = null;
+let selectedGroup = null;
+const origEmissive = new Map();
+
+function getAllMeshes() {
+  const all = [];
+  scene.traverse(o => { if(o.isMesh) all.push(o); });
+  return all;
 }
 
-// Island countertop — waterfall edge
-const islandCt = box(islandW, 0.05, islandD + 0.08, mats.counter, islandX, 0.915, islandZ);
-counterMeshes.push(islandCt);
-// Waterfall sides
-const waterL = box(0.05, 0.9, islandD + 0.08, mats.counter, islandX - islandW/2 - 0.025, 0.46, islandZ);
-const waterR = box(0.05, 0.9, islandD + 0.08, mats.counter, islandX + islandW/2 + 0.025, 0.46, islandZ);
-counterMeshes.push(waterL, waterR);
-
-// ── BAR STOOLS ───────────────────────────────────────────────────────────────
-[-0.8, 0.0, 0.8].forEach(sx => {
-  const seat = box(0.32, 0.04, 0.32, mats.hardware, islandX + sx, 0.82, islandZ + islandD/2 + 0.2);
-  const legL = box(0.025, 0.8, 0.025, mats.hardware, islandX + sx - 0.12, 0.4, islandZ + islandD/2 + 0.2 - 0.1);
-  const legR = box(0.025, 0.8, 0.025, mats.hardware, islandX + sx + 0.12, 0.4, islandZ + islandD/2 + 0.2 - 0.1);
-  const legLB = box(0.025, 0.8, 0.025, mats.hardware, islandX + sx - 0.12, 0.4, islandZ + islandD/2 + 0.2 + 0.1);
-  const legRB = box(0.025, 0.8, 0.025, mats.hardware, islandX + sx + 0.12, 0.4, islandZ + islandD/2 + 0.2 + 0.1);
-  const foot  = box(0.28, 0.025, 0.025, mats.hardware, islandX + sx, 0.44, islandZ + islandD/2 + 0.2);
-});
-
-// ── SINK (in island) ─────────────────────────────────────────────────────────
-const sinkBasin = box(0.5, 0.02, 0.35, mats.steel, islandX - 0.7, 0.92, islandZ);
-const faucetBase = box(0.04, 0.04, 0.04, mats.steel, islandX - 0.7, 0.96, islandZ - 0.12);
-const faucetArm  = box(0.04, 0.26, 0.04, mats.steel, islandX - 0.7, 1.07, islandZ - 0.12);
-const faucetSpout= box(0.2,  0.04, 0.04, mats.steel, islandX - 0.6, 1.19, islandZ - 0.12);
-
-// ── PENDANT LIGHTS ABOVE ISLAND ──────────────────────────────────────────────
-[-0.6, 0.0, 0.6].forEach(px => {
-  // Cord
-  box(0.015, 0.6, 0.015, mats.hardware, islandX + px, 3.7, islandZ - 0.1);
-  // Shade (inverted cone shape via scaled box)
-  const shade = box(0.22, 0.15, 0.22, mats.hardware, islandX + px, 3.38, islandZ - 0.1);
-  shade.scale.set(1, 1, 1);
-});
-
-// ── CEILING RECESSED LIGHTS ──────────────────────────────────────────────────
-[[−1.8,−2.8],[1.8,−2.8],[−1.8,0.4],[1.8,0.4],[0,0.4],[0,−2.8]].forEach(([lx,lz]) => {
-  box(0.15, 0.04, 0.15, mats.hardware, lx, 4.44, lz);
-});
-
-// ── WINDOW ───────────────────────────────────────────────────────────────────
-const win = box(1.4, 1.0, 0.08, mats.glass, -4.96, 2.2, -0.5);
-// Window frame
-box(1.4, 0.06, 0.1, mats.wall, -4.96, 2.72, -0.5);
-box(1.4, 0.06, 0.1, mats.wall, -4.96, 1.68, -0.5);
-box(0.06, 1.0, 0.1, mats.wall, -5.67, 2.2, -0.5);
-box(0.06, 1.0, 0.1, mats.wall, -4.25, 2.2, -0.5);
-
-// ── LIGHTS ───────────────────────────────────────────────────────────────────
-const ambientLight = new THREE.AmbientLight(0xFFF5E8, 0.6);
-scene.add(ambientLight);
-
-const sunLight = new THREE.DirectionalLight(0xFFEDD5, 1.4);
-sunLight.position.set(4, 8, 5);
-sunLight.castShadow = true;
-sunLight.shadow.mapSize.set(2048, 2048);
-sunLight.shadow.camera.near = 0.5;
-sunLight.shadow.camera.far  = 30;
-sunLight.shadow.camera.left = -8;
-sunLight.shadow.camera.right = 8;
-sunLight.shadow.camera.top  = 8;
-sunLight.shadow.camera.bottom = -8;
-sunLight.shadow.bias = -0.001;
-scene.add(sunLight);
-
-// Ceiling fill
-const fillLight = new THREE.PointLight(0xFFF8F0, 0.8, 12);
-fillLight.position.set(0, 4, 0);
-scene.add(fillLight);
-
-// Pendant lights above island
-const p1 = new THREE.PointLight(0xFFEE99, 1.2, 3.5);
-p1.position.set(islandX - 0.6, 3.3, islandZ - 0.1);
-const p2 = new THREE.PointLight(0xFFEE99, 1.2, 3.5);
-p2.position.set(islandX,       3.3, islandZ - 0.1);
-const p3 = new THREE.PointLight(0xFFEE99, 1.2, 3.5);
-p3.position.set(islandX + 0.6, 3.3, islandZ - 0.1);
-scene.add(p1, p2, p3);
-
-// Under-cabinet warm LED
-const ledLight = new THREE.RectAreaLight ? null : new THREE.PointLight(0xFFF0CC, 0.5, 3);
-if (ledLight) { ledLight.position.set(-1.8, 2.1, -2.8); scene.add(ledLight); }
-
-// Store refs for lighting changes
-const lights = { ambient: ambientLight, sun: sunLight, fill: fillLight, pendants: [p1,p2,p3] };
-
-// ── COLOR SWATCHES ────────────────────────────────────────────────────────────
-const cabinetNames = {
-  '#8B6B2E':'Warm Wood','#FFFFFF':'White','#3D4A52':'Slate Grey',
-  '#1C1C1C':'Matte Black','#B8C4BB':'Sage','#C4933F':'Gold'
-};
-const counterNames = {
-  '#E8E4DC':'White Quartz','#2A2A2A':'Black Granite',
-  '#C8B89A':'Marble Beige','#7A8B7C':'Green Quartz'
-};
-
-document.querySelectorAll('#cabinetColors .color-swatch').forEach(sw => {
-  sw.addEventListener('click', () => {
-    document.querySelectorAll('#cabinetColors .color-swatch').forEach(s => s.classList.remove('active'));
-    sw.classList.add('active');
-    const col = new THREE.Color(sw.dataset.color);
-    cabinetMeshes.forEach(m => {
-      if (Array.isArray(m.material)) m.material.forEach(mt => { if(mt.color) mt.color.set(col); });
-      else if (m.material.color) m.material.color.set(col);
-    });
-    mats.cabinet.color.set(col);
-    mats.cabinetEdge.color.set(col).multiplyScalar(0.78);
-    document.getElementById('infoStyle').textContent = cabinetNames[sw.dataset.color] || sw.dataset.color;
+function highlightGroup(key, intensity=0.25) {
+  const arr = groups[key] || [];
+  arr.forEach(m => {
+    if(!origEmissive.has(m)) origEmissive.set(m, m.material.emissive?.getHex() || 0x000000);
+    m.material = m.material.clone();
+    m.material.emissive = new THREE.Color(0xC4933F);
+    m.material.emissiveIntensity = intensity;
   });
-});
-
-document.querySelectorAll('#counterColors .color-swatch').forEach(sw => {
-  sw.addEventListener('click', () => {
-    document.querySelectorAll('#counterColors .color-swatch').forEach(s => s.classList.remove('active'));
-    sw.classList.add('active');
-    const col = new THREE.Color(sw.dataset.color);
-    counterMeshes.forEach(m => {
-      if (m.material.color) m.material.color.set(col);
-    });
-    mats.counter.color.set(col);
-    document.getElementById('infoCt').textContent = counterNames[sw.dataset.color] || sw.dataset.color;
-  });
-});
-
-// ── CAMERA VIEWS ──────────────────────────────────────────────────────────────
-const views = {
-  front:  { pos:[5.5, 3.2, 6.0],   target:[0, 1.2, 0] },
-  side:   { pos:[-6.5, 2.8, 1.5],  target:[0, 1.2, -1.5] },
-  top:    { pos:[0, 10, 0.1],       target:[0, 0, 0] },
-  island: { pos:[islandX+0.5, 2.0, islandZ+3.5], target:[islandX, 0.9, islandZ] },
-};
-
-function setView(name) {
-  document.querySelectorAll('[id^=view]').forEach(b => b.classList.remove('active'));
-  document.getElementById('view' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
-  const v = views[name];
-  gsap.to(camera.position, { x:v.pos[0], y:v.pos[1], z:v.pos[2], duration:1.4, ease:'power3.inOut' });
-  gsap.to(controls.target, { x:v.target[0], y:v.target[1], z:v.target[2], duration:1.4, ease:'power3.inOut',
-    onUpdate: () => controls.update() });
 }
 
-// ── LIGHTING MODES ───────────────────────────────────────────────────────────
-function setLight(mode) {
-  document.querySelectorAll('[id^=light]').forEach(b => b.classList.remove('active'));
-  document.getElementById('light' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
-  if (mode === 'day') {
-    gsap.to(lights.ambient, { intensity:0.6, duration:.8 });
-    gsap.to(lights.sun, { intensity:1.4, duration:.8 });
-    lights.pendants.forEach(p => gsap.to(p, { intensity:1.2, duration:.8 }));
-    renderer.toneMappingExposure = 1.1;
-    scene.background.set(0x0d0d0f);
-    scene.fog = new THREE.FogExp2(0x0d0d0f, 0.04);
-  } else if (mode === 'night') {
-    gsap.to(lights.ambient, { intensity:0.15, duration:.8 });
-    gsap.to(lights.sun, { intensity:0.1, duration:.8 });
-    lights.pendants.forEach(p => gsap.to(p, { intensity:3.0, duration:.8 }));
-    renderer.toneMappingExposure = 0.85;
-    scene.background.set(0x050508);
-    scene.fog = new THREE.FogExp2(0x050508, 0.06);
-  } else if (mode === 'drama') {
-    gsap.to(lights.ambient, { intensity:0.12, duration:.8 });
-    gsap.to(lights.sun, { intensity:3.0, duration:.8 });
-    lights.pendants.forEach(p => gsap.to(p, { intensity:0.4, duration:.8 }));
-    renderer.toneMappingExposure = 1.4;
-    scene.background.set(0x080406);
+function clearHighlight(key, keepSelected=false) {
+  if(keepSelected && key === selectedGroup) return;
+  const arr = groups[key] || [];
+  arr.forEach(m => {
+    if(m.material) {
+      m.material.emissive = new THREE.Color(0x000000);
+      m.material.emissiveIntensity = 0;
+    }
+  });
+}
+
+function clearAllHighlights() {
+  Object.keys(groups).forEach(k => {
+    if(k === selectedGroup) return;
+    clearHighlight(k);
+  });
+}
+
+// ── HOVER CARD ───────────────────────────────────────────────────────────────
+const hoverCard = document.getElementById('hoverCard');
+let cardX = 0, cardY = 0, targetCardX = 0, targetCardY = 0;
+
+function showCard(key, px, py) {
+  const info = INFO[key];
+  if(!info) return;
+  document.getElementById('hcIcon').textContent  = info.icon;
+  document.getElementById('hcTitle').textContent = info.title;
+  document.getElementById('hcSub').textContent   = info.sub;
+  document.getElementById('hcDesc').textContent  = info.desc;
+  targetCardX = px + 22;
+  targetCardY = py - 80;
+  hoverCard.classList.add('show');
+}
+function hideCard() { hoverCard.classList.remove('show'); }
+
+// ── DETAIL PANEL ─────────────────────────────────────────────────────────────
+function showDetail(key) {
+  const info = INFO[key];
+  if(!info) return;
+  document.getElementById('dpIcon').textContent  = info.icon;
+  document.getElementById('dpTitle').textContent = info.title;
+  document.getElementById('dpTag').textContent   = info.sub;
+  document.getElementById('dpDesc').textContent  = info.desc;
+  const specsEl = document.getElementById('dpSpecs');
+  specsEl.innerHTML = (info.specs||[]).map(([k,v])=>
+    `<div class="dp-spec"><span class="sk">${k}</span><span class="sv">${v}</span></div>`
+  ).join('');
+  document.getElementById('detailPanel').classList.add('show');
+
+  // Fly camera
+  if(info.camPos) {
+    gsap.to(camera.position, { x:info.camPos[0], y:info.camPos[1], z:info.camPos[2], duration:1.6, ease:'power3.inOut' });
+    gsap.to(controls.target, { x:info.camTarget[0], y:info.camTarget[1], z:info.camTarget[2],
+      duration:1.6, ease:'power3.inOut', onUpdate:()=>controls.update() });
   }
 }
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('show');
+  if(selectedGroup) { clearHighlight(selectedGroup); selectedGroup=null; }
+  gsap.to(camera.position, { x:5.8, y:3.4, z:6.5, duration:1.4, ease:'power3.inOut' });
+  gsap.to(controls.target, { x:0, y:1.1, z:0, duration:1.4, ease:'power3.inOut', onUpdate:()=>controls.update() });
+}
 
-// ── ANIMATE LOOP ─────────────────────────────────────────────────────────────
+// ── INPUT ─────────────────────────────────────────────────────────────────────
+const cur  = document.getElementById('cur');
+const curR = document.getElementById('cur-r');
+let mx=0,my=0,rx=0,ry=0;
+
+canvas.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left  = mx+'px'; cur.style.top = my+'px';
+  mouse.set((e.clientX/innerWidth)*2-1, -(e.clientY/innerHeight)*2+1);
+  targetCardX = e.clientX+22; targetCardY = e.clientY-80;
+});
+
+canvas.addEventListener('click', e => {
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(getAllMeshes());
+  if(hits.length) {
+    const key = meshToGroup.get(hits[0].object);
+    if(key) {
+      if(selectedGroup && selectedGroup !== key) clearHighlight(selectedGroup);
+      selectedGroup = key;
+      highlightGroup(key, 0.4);
+      showDetail(key);
+      hideCard();
+    }
+  }
+});
+
+// ── COLOR SWATCHES ────────────────────────────────────────────────────────────
+document.querySelectorAll('.swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+    sw.classList.add('active');
+    const col = new THREE.Color(sw.dataset.color);
+    allCabs.forEach(m => {
+      m.material = m.material.clone();
+      m.material.color.set(col);
+    });
+  });
+});
+
+// ── ANIMATION LOOP ────────────────────────────────────────────────────────────
+// Auto-rotate when idle
+let lastMove = Date.now();
+canvas.addEventListener('mousemove', ()=>lastMove=Date.now());
+
 function animate() {
   requestAnimationFrame(animate);
-  controls.update();
+
+  // Cursor ring follow
+  rx += (mx-rx)*.1; ry += (my-ry)*.1;
+  curR.style.left=rx+'px'; curR.style.top=ry+'px';
+
+  // Hover card smooth follow
+  cardX += (targetCardX-cardX)*.12;
+  cardY += (targetCardY-cardY)*.12;
+  hoverCard.style.left=cardX+'px';
+  hoverCard.style.top=cardY+'px';
+
+  // Raycast hover
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(getAllMeshes());
+  let newHover = null;
+  if(hits.length) {
+    newHover = meshToGroup.get(hits[0].object) || null;
+  }
+  if(newHover !== hoveredGroup) {
+    if(hoveredGroup && hoveredGroup !== selectedGroup) clearHighlight(hoveredGroup);
+    if(newHover && newHover !== selectedGroup) highlightGroup(newHover, 0.22);
+    hoveredGroup = newHover;
+    if(newHover) {
+      showCard(newHover, mx, my);
+      cur.classList.add('hover'); curR.classList.add('hover');
+      canvas.style.cursor='pointer';
+    } else {
+      hideCard();
+      cur.classList.remove('hover'); curR.classList.remove('hover');
+      canvas.style.cursor='none';
+    }
+  }
+
   // Gentle pendant sway
-  const t = Date.now() * 0.001;
-  p1.position.x = islandX - 0.6 + Math.sin(t * 0.7) * 0.015;
-  p2.position.x = islandX      + Math.sin(t * 0.9 + 1) * 0.015;
-  p3.position.x = islandX + 0.6 + Math.sin(t * 0.8 + 2) * 0.015;
+  const t = Date.now()*.001;
+  pendLights.forEach((pl,i)=>{
+    pl.position.x = IX + (i-.65)*.65 + Math.sin(t*.6+i)*0.02;
+  });
+
+  // Auto-rotate when idle > 4s and no panel open
+  const idle = Date.now()-lastMove > 4000;
+  controls.autoRotate = idle && !document.getElementById('detailPanel').classList.contains('show');
+  controls.autoRotateSpeed = 0.4;
+
+  controls.update();
   renderer.render(scene, camera);
 }
 animate();
 
-// ── RESIZE ───────────────────────────────────────────────────────────────────
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+// ── RESIZE ────────────────────────────────────────────────────────────────────
+window.addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(innerWidth,innerHeight);
 });
 
-// ── LOADING ANIMATION ────────────────────────────────────────────────────────
-const loadFill = document.getElementById('loadFill');
-const loader   = document.getElementById('loading');
-let progress   = 0;
-const loadInterval = setInterval(() => {
-  progress = Math.min(progress + Math.random() * 18, 100);
-  loadFill.style.width = progress + '%';
-  if (progress >= 100) {
-    clearInterval(loadInterval);
-    setTimeout(() => {
-      gsap.to(loader, { opacity:0, duration:.6, onComplete:() => loader.style.display='none' });
-      // Intro camera sweep
-      gsap.from(camera.position, {
-        x: 2, y: 6, z: 12, duration: 2.4, ease:'power3.inOut',
-        onUpdate: () => controls.update()
-      });
-    }, 300);
+// ── LOADER → HERO REVEAL ──────────────────────────────────────────────────────
+const loader = document.getElementById('loader');
+const lFill  = document.getElementById('lFill');
+const lLogo  = document.getElementById('lLogo');
+const messages = ['Crafting your kitchen...','Adding quartz countertops...','Installing pendant lights...','Almost ready...'];
+let msgI = 0;
+
+// Animate logo
+gsap.to(lLogo, { opacity:1, y:0, duration:.6, ease:'power2.out', delay:.2 });
+
+let prog = 0;
+const iv = setInterval(()=>{
+  prog = Math.min(prog + Math.random()*14, 100);
+  lFill.style.width = prog+'%';
+  if(Math.random()>.6) {
+    msgI = (msgI+1)%messages.length;
+    document.getElementById('lMsg').textContent = messages[msgI];
   }
-}, 60);
+  if(prog>=100){
+    clearInterval(iv);
+    setTimeout(()=>{
+      // Hide loader
+      gsap.to(loader,{ opacity:0, duration:.7, onComplete:()=>loader.style.display='none' });
+
+      // Reveal hero text
+      const ht = document.getElementById('heroText');
+      gsap.to(ht.querySelector('.ht-tag'), { opacity:1, y:0, duration:.6, delay:.2, ease:'power3.out' });
+      gsap.to(ht.querySelector('h1'),      { opacity:1, y:0, duration:.8, delay:.4, ease:'power3.out' });
+      gsap.to(ht.querySelector('p'),       { opacity:1, y:0, duration:.6, delay:.6, ease:'power3.out' });
+      gsap.to(ht.querySelector('.ht-btns'),{ opacity:1, y:0, duration:.6, delay:.8, ease:'power3.out' });
+
+      // Camera intro sweep
+      gsap.from(camera.position, { x:2, y:7, z:12, duration:2.6, ease:'power3.inOut',
+        onUpdate:()=>controls.update() });
+
+    }, 400);
+  }
+}, 65);
 </script>
 </body>
 </html>
