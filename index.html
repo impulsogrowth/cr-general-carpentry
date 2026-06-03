@@ -290,6 +290,22 @@ footer{background:var(--black);padding:3.5rem 3rem 2rem;border-top:1px solid rgb
 <div id="cur-r"></div>
 <div id="cur-label"></div>
 
+<!-- ══ 3D KITCHEN POPUP ══ -->
+<div id="kitchenPopup" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(8,8,8,.0)">
+  <div id="kitchenPopupInner" style="position:absolute;inset:0;transform:scale(.92);opacity:0;transition:none">
+    <iframe id="kitchenFrame" src="" style="width:100%;height:100%;border:none;display:block"></iframe>
+    <button onclick="closeKitchen()" style="
+      position:absolute;top:1.2rem;right:1.2rem;
+      width:44px;height:44px;border-radius:50%;
+      background:rgba(8,8,8,.85);backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,.12);
+      color:white;font-size:1.1rem;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      z-index:10;transition:background .2s;font-family:inherit;
+    " onmouseover="this.style.background='rgba(196,147,63,.3)'" onmouseout="this.style.background='rgba(8,8,8,.85)'">✕</button>
+  </div>
+</div>
+
 <!-- FLOATS -->
 <div class="floats">
   <a href="https://wa.me/17868036784?text=Hi%20C%26R!%20I'd%20like%20a%20free%20quote." target="_blank" class="float-wa">
@@ -311,7 +327,7 @@ footer{background:var(--black);padding:3.5rem 3rem 2rem;border-top:1px solid rgb
     <li><a href="#services">Services</a></li>
     <li><a href="#reviews">Reviews</a></li>
     <li><a href="tel:+17868036784" class="nav-phone">📞 (786) 803-6784</a></li>
-    <li><a href="kitchen-3d.html" style="color:var(--gold-lt);font-weight:700">🧊 3D Kitchen</a></li>
+    <li><a href="#" onclick="openKitchen();return false" style="color:var(--gold-lt);font-weight:700">🧊 3D Kitchen</a></li>
     <li><a href="#quote" class="nav-cta">Free Quote</a></li>
   </ul>
   <div style="display:flex;align-items:center;gap:.6rem">
@@ -777,6 +793,36 @@ function submitForm(e){e.preventDefault();document.getElementById('quoteForm').s
 
 // LANG
 let lang='en';
+// ── 3D KITCHEN POPUP ─────────────────────────────────────────────────────────
+function openKitchen() {
+  const popup  = document.getElementById('kitchenPopup');
+  const inner  = document.getElementById('kitchenPopupInner');
+  const frame  = document.getElementById('kitchenFrame');
+  // Load iframe only once
+  if (!frame.src || frame.src === window.location.href) frame.src = 'kitchen-3d.html';
+  popup.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  lenis.stop();
+  // Animate in
+  gsap.to(popup,  { background:'rgba(8,8,8,.95)', duration:.4, ease:'power2.out' });
+  gsap.to(inner,  { opacity:1, scale:1, duration:.5, ease:'back.out(1.4)',
+    onStart: () => { inner.style.transition = 'none'; } });
+}
+function closeKitchen() {
+  const popup = document.getElementById('kitchenPopup');
+  const inner = document.getElementById('kitchenPopupInner');
+  gsap.to(inner, { opacity:0, scale:.92, duration:.35, ease:'power2.in' });
+  gsap.to(popup, { background:'rgba(8,8,8,.0)', duration:.4, ease:'power2.in',
+    onComplete: () => {
+      popup.style.display = 'none';
+      document.body.style.overflow = '';
+      lenis.start();
+    }
+  });
+}
+// Close on Escape key
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeKitchen(); });
+
 function toggleLang(){
   lang=lang==='en'?'es':'en';
   document.getElementById('langBtn').textContent=lang==='en'?'ES':'EN';
