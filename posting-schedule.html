@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C&R General Carpentry — Meta Posting Schedule</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold:   #C4933A;
+    --dark:   #1A1208;
+    --mid:    #2D2010;
+    --wood:   #3D2B1A;
+    --cream:  #F5F0E8;
+    --white:  #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: #1a1a1a; line-height: 1.6; }
+
+  /* Cover */
+  .cover {
+    background: var(--dark);
+    padding: 64px 48px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(196,147,58,0.12) 0%, transparent 65%);
+  }
+  .cover-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 16px;
+  }
+  .cover h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 900; color: white; line-height: 1.1; margin-bottom: 14px;
+  }
+  .cover h1 span { color: var(--gold); }
+  .cover-sub { font-size: 15px; color: rgba(255,255,255,0.55); max-width: 520px; }
+  .gold-bar { height: 4px; background: linear-gradient(90deg, var(--gold), #8B6014, var(--gold)); }
+
+  /* Layout */
+  .container { max-width: 960px; margin: 0 auto; padding: 52px 36px; }
+
+  /* Section */
+  .section { margin-bottom: 56px; }
+  .section-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 8px;
+  }
+  .section h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 28px; font-weight: 700; color: var(--dark);
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(196,147,58,0.2);
+    padding-bottom: 12px;
+  }
+  p { color: #555; font-size: 14px; margin-bottom: 12px; }
+
+  /* Weekly grid */
+  .week-grid { display: grid; gap: 14px; }
+  .day-card {
+    background: white;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    display: grid;
+    grid-template-columns: 100px 1fr;
+  }
+  .day-label {
+    background: var(--dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 12px;
+    text-align: center;
+  }
+  .day-name {
+    font-family: 'Fraunces', serif;
+    font-size: 18px; font-weight: 700; color: var(--gold);
+    line-height: 1;
+  }
+  .day-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+  .day-body { padding: 20px 24px; }
+  .day-body h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 16px; color: var(--dark); margin-bottom: 6px;
+  }
+  .day-meta {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+    padding: 3px 10px; border-radius: 100px;
+    text-transform: uppercase;
+  }
+  .tag.format  { background: rgba(196,147,58,0.12); color: var(--gold); }
+  .tag.pillar  { background: rgba(61,43,26,0.08);  color: var(--wood); }
+  .tag.platform{ background: #e8f0fe; color: #1a73e8; }
+  .tag.time    { background: #e8f5e9; color: #2e7d32; }
+  .day-body p  { font-size: 13px; color: #666; margin: 0; }
+  .day-card.rest .day-label { background: #f5f5f5; }
+  .day-card.rest .day-name  { color: #bbb; }
+  .day-card.rest .day-body h3 { color: #bbb; }
+  .day-card.rest .day-body p  { color: #ccc; }
+
+  /* Best times */
+  .times-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .time-card {
+    background: white;
+    border-radius: 12px;
+    padding: 22px 18px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.06);
+    text-align: center;
+    border-top: 3px solid var(--gold);
+  }
+  .time-val {
+    font-family: 'Fraunces', serif;
+    font-size: 22px; font-weight: 700; color: var(--dark);
+    display: block; margin-bottom: 6px;
+  }
+  .time-label { font-size: 12px; color: #888; }
+
+  /* Content types */
+  .types-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+    gap: 14px;
+  }
+  .type-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px 20px;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.06);
+  }
+  .type-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+  .type-card h4 { font-family: 'Fraunces', serif; font-size: 16px; color: var(--dark); margin-bottom: 6px; }
+  .type-card p  { font-size: 12px; color: #777; margin: 0; }
+
+  /* Hashtag box */
+  .hashtag-box {
+    background: var(--dark);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-top: 4px;
+  }
+  .hashtag-box p { color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 14px; }
+  .hashtags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hashtag {
+    background: rgba(196,147,58,0.12);
+    border: 1px solid rgba(196,147,58,0.25);
+    color: var(--gold);
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 12px; font-weight: 500;
+  }
+
+  /* Caption formula */
+  .formula-box {
+    background: white;
+    border-radius: 14px;
+    padding: 28px 32px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  }
+  .formula-step {
+    display: flex; gap: 16px; align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .formula-step:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--dark); color: var(--gold);
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-text strong { display: block; font-size: 13px; color: var(--dark); margin-bottom: 2px; }
+  .step-text span   { font-size: 12px; color: #888; }
+
+  /* Footer */
+  .footer {
+    background: var(--dark);
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    padding: 32px;
+    font-size: 12px;
+    margin-top: 48px;
+  }
+  .footer strong { color: var(--gold); }
+
+  @media (max-width: 600px) {
+    .cover { padding: 44px 24px 36px; }
+    .container { padding: 36px 18px; }
+    .day-card { grid-template-columns: 80px 1fr; }
+    .day-name { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-tag">Impulso Operations · Social Media Strategy</div>
+  <h1>C&R General Carpentry<br><span>Meta Posting Schedule</span></h1>
+  <div class="cover-sub">Weekly content plan optimized for Instagram & Facebook reach — every post type, time, and caption formula.</div>
+</div>
+<div class="gold-bar"></div>
+
+<div class="container">
+
+  <!-- Weekly Schedule -->
+  <div class="section">
+    <div class="section-label">Weekly Plan</div>
+    <h2>7-Day Posting Schedule</h2>
+    <p>Each day targets a different content pillar so the feed stays fresh and covers every stage of the buyer journey — from discovery to trust to booking.</p>
+
+    <p style="font-size:13px; color:#888; margin-bottom:20px;">2–3 pieces per day — morning, midday, and evening. Different formats hit different audiences at different times. Stories run all day on top of this.</p>
+
+    <div class="week-grid">
+
+      <!-- Monday -->
+      <div class="day-card">
+        <div class="day-label">
+          <div class="day-name">Mon</div>
+          <div class="day-sub">Week Opener</div>
+        </div>
+        <div class="day-body">
+          <h3>🎬 AM — Before & After Reel &nbsp;·&nbsp; 📊 PM — Carousel &nbsp;·&nbsp; 📖 EVE — Stories</h3>
+          <div class="day-meta">
+            <span class="tag time">7:00 AM</span>
+            <span class="tag time">12:00 PM</span>
+            <span class="tag time">7:00 PM Stories</span>
+            <span class="tag platform">IG + FB</span>
+          </div>
+          <p><strong>7am Reel:</strong> Before & after kitchen or cabinet reveal — trending audio, no talking. Highest reach format, catches the morning scroll.<br>
+          <strong>12pm Carousel:</strong> Education post — "How much does a kitchen remodel cost in Miami?" or "5 upgrades that add the most value to your home."<br>
+          <strong>7pm Stories:</strong> Behind the scenes from a current job + poll sticker.</p>
+        </div>
+      </div>
+
+      <!-- Tuesday -->
+      <div class="day-card">
+        <div class="day-label">
+          <div class="day-name">Tue</div>
+          <div class="day-sub">Trust Day</div>
+        </div>
+        <div class="day-body">
+          <h3>⭐ AM — Testimonial &nbsp;·&nbsp; 📸 PM — Detail Shot &nbsp;·&nbsp; 📖 EVE — Stories</h3>
+          <div class="day-meta">
+            <span class="tag time">8:00 AM</span>
+            <span class="tag time">1:00 PM</span>
+            <span class="tag time">6:00 PM Stories</span>
+            <span class="tag platform">IG + FB</span>
+          </div>
+          <p><strong>8am Testimonial:</strong> Client review screenshot over a project photo, or a short video clip of a happy client. Social proof is the #1 trust builder.<br>
+          <strong>1pm Detail Shot:</strong> Close-up — quartz edge, cabinet hardware, tile work, custom woodwork. Short caption, one strong question to drive comments.<br>
+          <strong>6pm Stories:</strong> Repost both posts to Stories + add a "DM us for estimate" link sticker.</p>
+        </div>
+      </div>
+
+      <!-- Wednesday -->
+      <div class="day-card">
+        <div class="day-label">
+          <div class="day-name">Wed</div>
+          <div class="day-sub">Mid-Week Push</div>
+        </div>
+        <div class="day-body">
+          <h3>🔨 AM — Process Reel &nbsp;·&nbsp; 🏠 PM — Project Photo &nbsp;·&nbsp; 📖 EVE — Stories</h3>
+          <div class="day-meta">
+            <span class="tag time">7:00 AM</span>
+            <span class="tag time">12:00 PM</span>
+            <span class="tag time">7:00 PM Stories</span>
+            <span class="tag platform">IG + FB</span>
+          </div>
+          <p><strong>7am Process Reel:</strong> Timelapse or fast-cut of install day — cabinets going in, tile being laid, countertop drop. Shows scale and professionalism. Trending audio.<br>
+          <strong>12pm Project Photo:</strong> Wide shot of a finished kitchen or room. Clean, bright, styled. Let the work speak.<br>
+          <strong>7pm Stories:</strong> "Guess the price of this kitchen" poll or Q&A sticker — drives replies and DMs.</p>
+        </div>
+      </div>
+
+      <!-- Thursday -->
+      <div class="day-card">
+        <div class="day-label">
+          <div class="day-name">Thu</div>
+          <div class="day-sub">Educate & Close</div>
+        </div>
+        <div class="day-body">
+          <h3>📊 AM — Tips Carousel &nbsp;·&nbsp; 🎬 EVE — Reel &nbsp;·&nbsp; 📖 Stories</h3>
+          <div class="day-meta">
+            <span class="tag time">9:00 AM</span>
+            <span class="tag time">6:00 PM</span>
+            <span class="tag time">Throughout Stories</span>
+            <span class="tag platform">IG + FB</span>
+          </div>
+          <p><strong>9am Carousel:</strong> "Quartz vs. granite — which is right for your kitchen?", "Cabinet styles that never go out of style", or "What to ask your contractor before signing." Saves = algorithm gold.<br>
+          <strong>6pm Reel:</strong> Short transformation clip — before photo → satisfying process clips → reveal. Keep it under 20 seconds, no talking needed.<br>
+          <strong>Stories:</strong> Job site update + "We have 2 spots open next month — DM to reserve yours."</p>
+        </div>
+      </div>
+
+      <!-- Friday -->
+      <div class="day-card">
+        <div class="day-label">
+          <div class="day-name">Fri</div>
+          <div class="day-sub">Weekend Warm-Up</div>
+        </div>
+        <div class="day-body">
+          <h3>🏠 AM — Full Project Carousel &nbsp;·&nbsp; 📖 PM — Stories Push</h3>
+          <div class="day-meta">
+            <span class="tag time">10:00 AM</span>
+            <span class="tag time">3:00 PM Stories</span>
+            <span class="tag platform">IG + FB</span>
+          </div>
+          <p><strong>10am Carousel:</strong> Full project story — before demo install reveal in 6–10 slides. Always end last slide with "DM us for a free estimate · 786-803-6784." This is the post that books jobs.<br>
+          <strong>3pm Stories:</strong> "Heading into the weekend — DM us your kitchen goals and we'll give you a ballpark." Creates urgency + captures weekend browsers who are home planning.</p>
+        </div>
+      </div>
+
+      <!-- Saturday -->
+      <div class="day-card">
+        <div class="day-label">
+          <div class="day-name">Sat</div>
+          <div class="day-sub">Peak Day</div>
+        </div>
+        <div class="day-body">
+          <h3>🎬 AM — Top Reel Repost &nbsp;·&nbsp; ⭐ MID — Social Proof &nbsp;·&nbsp; 📖 EVE — Stories</h3>
+          <div class="day-meta">
+            <span class="tag time">10:00 AM</span>
+            <span class="tag time">1:00 PM</span>
+            <span class="tag time">5:00 PM Stories</span>
+            <span class="tag platform">IG + FB</span>
+          </div>
+          <p><strong>10am:</strong> Repost or reshare the week's best-performing Reel — Saturday reach is highest of the week. Homeowners are home browsing and planning.<br>
+          <strong>1pm:</strong> Review post or before/after static photo with a strong caption. Weekends close deals — make it easy to DM.<br>
+          <strong>5pm Stories:</strong> "We're taking estimates for June — 2 spots left" countdown sticker or urgency Story.</p>
+        </div>
+      </div>
+
+      <!-- Sunday -->
+      <div class="day-card rest">
+        <div class="day-label">
+          <div class="day-name">Sun</div>
+          <div class="day-sub">Light Day</div>
+        </div>
+        <div class="day-body">
+          <h3>📖 Stories Only — Let the Week Run</h3>
+          <div class="day-meta">
+            <span class="tag format">Stories 1–2</span>
+            <span class="tag platform">Instagram</span>
+            <span class="tag time">Anytime</span>
+          </div>
+          <p>No feed post Sunday. The algorithm keeps pushing Saturday's content. Post 1–2 casual Stories — a project photo, a Sunday quote, or a behind-the-scenes moment. Recharge and prep content for Monday.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Daily Stories -->
+  <div class="section">
+    <div class="section-label">Every Day</div>
+    <h2>Daily Stories Strategy</h2>
+    <p>Post 2–4 Stories every single day regardless of feed posts. Stories keep you at the top of followers' feeds and build the habit of checking your account.</p>
+
+    <div class="types-grid">
+      <div class="type-card">
+        <span class="type-icon">📸</span>
+        <h4>Progress Shot</h4>
+        <p>Quick photo from a current job site. Raw and real beats polished every time in Stories.</p>
+      </div>
+      <div class="type-card">
+        <span class="type-icon">📊</span>
+        <h4>Poll or Question</h4>
+        <p>"Which countertop would you choose?" "Guess how long this install took." Drives replies = algorithm signal.</p>
+      </div>
+      <div class="type-card">
+        <span class="type-icon">🔗</span>
+        <h4>Link to Website</h4>
+        <p>2–3x per week add a "Get a Free Estimate" link sticker. Warm traffic to the site.</p>
+      </div>
+      <div class="type-card">
+        <span class="type-icon">🎬</span>
+        <h4>Repost Feed Content</h4>
+        <p>Always repost your feed posts to Stories right after publishing. Extends reach by 30–40%.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Best Times -->
+  <div class="section">
+    <div class="section-label">Timing</div>
+    <h2>Best Times to Post (Miami Audience)</h2>
+    <p>Meta's algorithm rewards posts that get engagement fast — posting when your audience is active is critical. These are the peak windows for Miami home renovation audiences.</p>
+
+    <div class="times-grid">
+      <div class="time-card">
+        <span class="time-val">7:00 AM</span>
+        <span class="time-label">Morning scroll — Mon/Tue/Wed</span>
+      </div>
+      <div class="time-card">
+        <span class="time-val">12:00 PM</span>
+        <span class="time-label">Lunch break — Tue/Wed/Thu</span>
+      </div>
+      <div class="time-card">
+        <span class="time-val">5:00 PM</span>
+        <span class="time-label">Post-work — Thu/Fri</span>
+      </div>
+      <div class="time-card">
+        <span class="time-val">7:00 PM</span>
+        <span class="time-label">Prime time — Mon/Thu</span>
+      </div>
+      <div class="time-card">
+        <span class="time-val">11:00 AM</span>
+        <span class="time-label">Weekend planning — Sat</span>
+      </div>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:20px 24px; margin-top:16px; box-shadow:0 2px 14px rgba(0,0,0,0.05);">
+      <p style="margin:0; font-size:13px; color:#666;"><strong style="color:var(--dark);">Pro tip:</strong> Check C&R's Instagram Insights → Audience → Most Active Times and adjust these windows to match exactly. Insights update monthly as the audience grows.</p>
+    </div>
+  </div>
+
+  <!-- Content Types -->
+  <div class="section">
+    <div class="section-label">Formats</div>
+    <h2>Content Format Priority</h2>
+    <p>Meta pushes different formats differently. Here's how to prioritize based on what drives reach vs. engagement vs. leads.</p>
+
+    <div class="types-grid">
+      <div class="type-card">
+        <span class="type-icon">🎬</span>
+        <h4>Reels — #1 for Reach</h4>
+        <p>Highest organic reach of any format. Before/afters and process videos perform best. 15–45 seconds, trending audio, no text needed.</p>
+      </div>
+      <div class="type-card">
+        <span class="type-icon">📊</span>
+        <h4>Carousels — #1 for Saves</h4>
+        <p>Most saved format = best for algorithm long-term. Education, project walkthroughs, tips. First slide must stop the scroll.</p>
+      </div>
+      <div class="type-card">
+        <span class="type-icon">📸</span>
+        <h4>Photos — #1 for Brand</h4>
+        <p>Detail shots and finished rooms build brand quality perception. Less reach than Reels but important for the overall feed aesthetic.</p>
+      </div>
+      <div class="type-card">
+        <span class="type-icon">📖</span>
+        <h4>Stories — #1 for Retention</h4>
+        <p>Keeps you top of mind with existing followers. Daily touchpoint. Not about reach — about staying in the conversation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Caption Formula -->
+  <div class="section">
+    <div class="section-label">Captions</div>
+    <h2>Caption Formula That Converts</h2>
+    <p>Every caption follows the same 5-part structure. Takes 3 minutes to write once you know the formula.</p>
+
+    <div class="formula-box">
+      <div class="formula-step">
+        <div class="step-num">1</div>
+        <div class="step-text">
+          <strong>Hook (first line — make them tap "more")</strong>
+          <span>"This kitchen went from builder-grade to jaw-dropping in 3 weeks." / "Most people waste money on the wrong upgrade first."</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="step-num">2</div>
+        <div class="step-text">
+          <strong>The story (2–3 sentences)</strong>
+          <span>What was the project, what was the challenge, what did we deliver. Keep it simple and specific — real details build trust.</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="step-num">3</div>
+        <div class="step-text">
+          <strong>Value or insight (1–2 sentences)</strong>
+          <span>One thing they can learn or take away. "The secret to a kitchen that looks expensive? Cabinet hardware. It's 5% of the budget and changes everything."</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="step-num">4</div>
+        <div class="step-text">
+          <strong>Question or engagement prompt</strong>
+          <span>"Which finish would you choose — matte black or brushed gold?" / "Tag someone who needs a kitchen upgrade 👇"</span>
+        </div>
+      </div>
+      <div class="formula-step">
+        <div class="step-num">5</div>
+        <div class="step-text">
+          <strong>CTA + Contact</strong>
+          <span>"Ready to start yours? DM us or call 786-803-6784 for a free estimate. Miami & surrounding areas." Then hashtags below.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hashtags -->
+  <div class="section">
+    <div class="section-label">Hashtags</div>
+    <h2>Hashtag Sets</h2>
+    <p>Rotate between these sets — don't use the same ones every post or Meta flags it as spam. Use 8–15 hashtags per post.</p>
+
+    <div class="hashtag-box">
+      <p>Set A — Kitchen Focus</p>
+      <div class="hashtags">
+        <span class="hashtag">#KitchenRemodel</span>
+        <span class="hashtag">#MiamiKitchen</span>
+        <span class="hashtag">#CustomCabinets</span>
+        <span class="hashtag">#KitchenDesign</span>
+        <span class="hashtag">#QuartzCountertops</span>
+        <span class="hashtag">#KitchenRenovation</span>
+        <span class="hashtag">#MiamiHomes</span>
+        <span class="hashtag">#HomeRemodel</span>
+        <span class="hashtag">#SouthFloridaHomes</span>
+        <span class="hashtag">#CRGeneralCarpentry</span>
+      </div>
+    </div>
+
+    <div class="hashtag-box" style="margin-top:12px;">
+      <p>Set B — Carpentry & Craftsmanship</p>
+      <div class="hashtags">
+        <span class="hashtag">#CustomCarpentry</span>
+        <span class="hashtag">#WoodworkMiami</span>
+        <span class="hashtag">#CabinetInstallation</span>
+        <span class="hashtag">#HomeImprovement</span>
+        <span class="hashtag">#ContractorMiami</span>
+        <span class="hashtag">#MiamiContractor</span>
+        <span class="hashtag">#FloridaRemodel</span>
+        <span class="hashtag">#Carpinteria</span>
+        <span class="hashtag">#BeforeAndAfter</span>
+        <span class="hashtag">#RenovationMiami</span>
+      </div>
+    </div>
+
+    <div class="hashtag-box" style="margin-top:12px;">
+      <p>Set C — Broad Reach</p>
+      <div class="hashtags">
+        <span class="hashtag">#HomeDecor</span>
+        <span class="hashtag">#InteriorDesign</span>
+        <span class="hashtag">#DreamKitchen</span>
+        <span class="hashtag">#KitchenInspo</span>
+        <span class="hashtag">#HouseGoals</span>
+        <span class="hashtag">#MiamiLife</span>
+        <span class="hashtag">#HomeTransformation</span>
+        <span class="hashtag">#Remodeling</span>
+        <span class="hashtag">#LuxuryKitchen</span>
+        <span class="hashtag">#ModernKitchen</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Prepared by <strong>Impulso Operations</strong> for C&R General Carpentry · @CRGeneralCarpentry · 786-803-6784</p>
+</div>
+
+</body>
+</html>
