@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>3D Kitchen Visualizer — C&R General Carpentry</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#C4933F;--gold-lt:#E8B96A;--black:#080808}
+body{background:var(--black);color:white;font-family:'Inter',sans-serif;overflow:hidden;height:100vh}
+#three-canvas{display:block;width:100vw;height:100vh}
+
+/* UI OVERLAY */
+.ui{position:fixed;inset:0;pointer-events:none;z-index:10}
+
+/* TOP BAR */
+.topbar{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;padding:1.2rem 2rem;background:linear-gradient(to bottom,rgba(8,8,8,.9),transparent);pointer-events:auto}
+.tb-logo{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900}
+.tb-logo span{color:var(--gold)}
+.tb-title{font-size:.75rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.45)}
+.tb-back{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.5);text-decoration:none;transition:color .2s;display:flex;align-items:center;gap:.4rem}
+.tb-back:hover{color:var(--gold)}
+
+/* CONTROLS PANEL */
+.controls{position:fixed;left:2rem;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:.6rem;pointer-events:auto}
+.ctrl-group{background:rgba(8,8,8,.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.2rem 1rem;min-width:180px}
+.ctrl-label{font-size:.58rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:.75rem}
+.color-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.color-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .2s;position:relative}
+.color-swatch:hover{transform:scale(1.15)}
+.color-swatch.active{border-color:white;box-shadow:0 0 0 1px rgba(255,255,255,.3)}
+.ctrl-btn{width:100%;padding:.55rem .8rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:rgba(255,255,255,.7);font-size:.75rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;text-align:left;display:flex;align-items:center;gap:.5rem}
+.ctrl-btn:hover,.ctrl-btn.active{background:rgba(196,147,63,.12);border-color:rgba(196,147,63,.3);color:var(--gold-lt)}
+.ctrl-slider{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:rgba(255,255,255,.12);outline:none;cursor:pointer;margin-top:.3rem}
+.ctrl-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--gold);cursor:pointer}
+
+/* INFO PANEL — bottom right */
+.info{position:fixed;right:2rem;bottom:2rem;background:rgba(8,8,8,.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.2rem 1.4rem;pointer-events:auto;min-width:220px}
+.info-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:900;margin-bottom:.3rem;color:white}
+.info-sub{font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.9rem}
+.info-specs{display:flex;flex-direction:column;gap:.35rem;margin-bottom:1rem}
+.info-spec{display:flex;justify-content:space-between;font-size:.75rem;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.info-spec:last-child{border-bottom:none}
+.info-spec .sk{color:rgba(255,255,255,.4)}
+.info-spec .sv{font-weight:600;color:var(--gold-lt)}
+.cta-btn{display:block;width:100%;padding:.7rem;background:var(--gold);border:none;border-radius:8px;color:var(--black);font-size:.8rem;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;transition:background .2s}
+.cta-btn:hover{background:var(--gold-lt)}
+
+/* HINT */
+.hint{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);font-size:.7rem;color:rgba(255,255,255,.28);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:.6rem;pointer-events:none}
+.hint::before,.hint::after{content:'';width:32px;height:1px;background:rgba(255,255,255,.15)}
+
+/* LOADING SCREEN */
+#loading{position:fixed;inset:0;background:var(--black);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem}
+#loading h2{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900}
+#loading h2 span{color:var(--gold)}
+.load-bar{width:240px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.load-fill{height:100%;background:var(--gold);width:0;transition:width .3s}
+#loading p{font-size:.72rem;color:rgba(255,255,255,.35);letter-spacing:.12em;text-transform:uppercase}
+
+@media(max-width:700px){
+  .controls{left:1rem;transform:translateY(-50%) scale(.85);transform-origin:left center}
+  .info{right:1rem;bottom:5rem;min-width:180px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <h2>C<span>&amp;R</span> Kitchen</h2>
+  <div class="load-bar"><div class="load-fill" id="loadFill"></div></div>
+  <p>Building your kitchen...</p>
+</div>
+
+<!-- CANVAS -->
+<canvas id="three-canvas"></canvas>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="tb-logo">C<span>&amp;R</span> Carpentry</div>
+  <div class="tb-title">3D Kitchen Visualizer</div>
+  <a href="index.html" class="tb-back">← Back to Site</a>
+</div>
+
+<!-- LEFT CONTROLS -->
+<div class="controls">
+
+  <div class="ctrl-group">
+    <div class="ctrl-label">Cabinet Color</div>
+    <div class="color-row" id="cabinetColors">
+      <div class="color-swatch active" data-color="#8B6B2E" style="background:#8B6B2E" title="Warm Wood"></div>
+      <div class="color-swatch" data-color="#FFFFFF" style="background:#FFFFFF" title="White"></div>
+      <div class="color-swatch" data-color="#3D4A52" style="background:#3D4A52" title="Slate Grey"></div>
+      <div class="color-swatch" data-color="#1C1C1C" style="background:#1C1C1C;border:1px solid rgba(255,255,255,.2)" title="Matte Black"></div>
+      <div class="color-swatch" data-color="#B8C4BB" style="background:#B8C4BB" title="Sage"></div>
+      <div class="color-swatch" data-color="#C4933F" style="background:#C4933F" title="Gold"></div>
+    </div>
+  </div>
+
+  <div class="ctrl-group">
+    <div class="ctrl-label">Countertop</div>
+    <div class="color-row" id="counterColors">
+      <div class="color-swatch active" data-color="#E8E4DC" style="background:#E8E4DC" title="White Quartz"></div>
+      <div class="color-swatch" data-color="#2A2A2A" style="background:#2A2A2A" title="Black Granite"></div>
+      <div class="color-swatch" data-color="#C8B89A" style="background:#C8B89A" title="Marble Beige"></div>
+      <div class="color-swatch" data-color="#7A8B7C" style="background:#7A8B7C" title="Green Quartz"></div>
+    </div>
+  </div>
+
+  <div class="ctrl-group">
+    <div class="ctrl-label">View</div>
+    <button class="ctrl-btn active" id="viewFront" onclick="setView('front')">🏠 Front View</button>
+    <button class="ctrl-btn" id="viewSide"  onclick="setView('side')">↔ Side View</button>
+    <button class="ctrl-btn" id="viewTop"   onclick="setView('top')">⬆ Top View</button>
+    <button class="ctrl-btn" id="viewIsland" onclick="setView('island')">🏝 Island Close-Up</button>
+  </div>
+
+  <div class="ctrl-group">
+    <div class="ctrl-label">Lighting</div>
+    <button class="ctrl-btn active" id="lightDay"   onclick="setLight('day')">☀️ Day</button>
+    <button class="ctrl-btn"        id="lightNight" onclick="setLight('night')">🌙 Night / LED</button>
+    <button class="ctrl-btn"        id="lightDrama" onclick="setLight('drama')">🎬 Dramatic</button>
+  </div>
+
+</div>
+
+<!-- INFO PANEL -->
+<div class="info" id="infoPanel">
+  <div class="info-title" id="infoTitle">Modern Kitchen</div>
+  <div class="info-sub">C&R General Carpentry · Miami, FL</div>
+  <div class="info-specs">
+    <div class="info-spec"><span class="sk">Style</span><span class="sv" id="infoStyle">Warm Wood</span></div>
+    <div class="info-spec"><span class="sk">Countertop</span><span class="sv" id="infoCt">White Quartz</span></div>
+    <div class="info-spec"><span class="sk">Features</span><span class="sv">Island + Upper Cabs</span></div>
+    <div class="info-spec"><span class="sk">Est. Range</span><span class="sv">$18,000 – $28,000</span></div>
+  </div>
+  <a href="#quote" class="cta-btn" onclick="window.location.href='index.html#quote'">Get This Quote →</a>
+</div>
+
+<div class="hint">Drag to rotate · Scroll to zoom · Click colors to change</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+// ── SCENE SETUP ──────────────────────────────────────────────────────────────
+const canvas   = document.getElementById('three-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+renderer.outputEncoding    = THREE.sRGBEncoding;
+renderer.toneMapping       = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+renderer.setClearColor(0x0a0a0a);
+
+const scene  = new THREE.Scene();
+scene.background = new THREE.Color(0x0d0d0f);
+scene.fog = new THREE.FogExp2(0x0d0d0f, 0.04);
+
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+camera.position.set(5.5, 3.2, 6.0);
+
+const controls = new THREE.OrbitControls(camera, canvas);
+controls.enableDamping   = true;
+controls.dampingFactor   = 0.06;
+controls.minDistance     = 2;
+controls.maxDistance     = 14;
+controls.maxPolarAngle   = Math.PI / 2 - 0.05;
+controls.target.set(0, 1.2, 0);
+controls.update();
+
+// ── MATERIALS ────────────────────────────────────────────────────────────────
+const mats = {};
+
+function makeMat(color, rough=0.7, metal=0) {
+  return new THREE.MeshStandardMaterial({ color:new THREE.Color(color), roughness:rough, metalness:metal });
+}
+
+// Cabinet wood
+mats.cabinet     = makeMat('#8B6B2E', 0.55, 0.0);
+mats.cabinetEdge = makeMat('#6B4F1E', 0.6,  0.0);
+// Countertop quartz
+mats.counter     = makeMat('#E8E4DC', 0.15, 0.05);
+// Floor
+mats.floor       = makeMat('#C8C0B4', 0.35, 0.0);
+// Wall
+mats.wall        = makeMat('#F0EDEA', 0.9,  0.0);
+// Backsplash tile (lighter marble look)
+mats.backsplash  = makeMat('#E4E0DA', 0.25, 0.0);
+// Stainless steel (fridge, appliances)
+mats.steel       = makeMat('#B0B8C0', 0.2, 0.8);
+// Black hardware
+mats.hardware    = makeMat('#1A1A1A', 0.3, 0.7);
+// Ceiling
+mats.ceiling     = makeMat('#F5F3F0', 0.95, 0.0);
+// Glass (windows)
+mats.glass = new THREE.MeshStandardMaterial({ color:0x88CCEE, roughness:0.05, metalness:0.1, transparent:true, opacity:0.25 });
+// LED strip under-cabinet
+mats.led = new THREE.MeshStandardMaterial({ color:0xFFF5D6, emissive:0xFFF5D6, emissiveIntensity:1.5 });
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function box(w, h, d, mat, x=0, y=0, z=0, rx=0, ry=0, rz=0) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat);
+  m.position.set(x,y,z);
+  m.rotation.set(rx,ry,rz);
+  m.castShadow    = true;
+  m.receiveShadow = true;
+  scene.add(m);
+  return m;
+}
+
+function handle(x, y, z) {
+  const g = new THREE.BoxGeometry(0.018, 0.12, 0.018);
+  const m = new THREE.Mesh(g, mats.hardware);
+  m.position.set(x, y, z);
+  m.castShadow = true;
+  scene.add(m);
+}
+
+// ── CABINET COLOR ARRAYS ──────────────────────────────────────────────────────
+const cabinetMeshes  = [];
+const counterMeshes  = [];
+
+// ── ROOM ─────────────────────────────────────────────────────────────────────
+// Floor
+const floor = box(10, 0.08, 8, mats.floor, 0, -0.04, 0);
+floor.receiveShadow = true;
+
+// Back wall
+const backWall = box(10, 4.5, 0.12, mats.wall, 0, 2.25, -3.5);
+backWall.receiveShadow = true;
+
+// Left wall
+const leftWall = box(0.12, 4.5, 8, mats.wall, -5, 2.25, 0);
+leftWall.receiveShadow = true;
+
+// Right wall (partial — open kitchen feel)
+const rightWall = box(0.12, 4.5, 4, mats.wall, 5, 2.25, -1);
+
+// Ceiling
+const ceiling = box(10, 0.1, 8, mats.ceiling, 0, 4.5, 0);
+
+// ── BASE CABINET FUNCTION ────────────────────────────────────────────────────
+function baseCabinet(x, z, w=0.6, h=0.88, d=0.56) {
+  const c = box(w-0.01, h, d-0.01, mats.cabinet, x, h/2, z);
+  cabinetMeshes.push(c);
+  // Door lines (inset panel look)
+  const door1 = box(w*0.44, h*0.64, 0.015, mats.cabinetEdge, x - w*0.24, h*0.48, z - d/2 + 0.025);
+  const door2 = box(w*0.44, h*0.64, 0.015, mats.cabinetEdge, x + w*0.24, h*0.48, z - d/2 + 0.025);
+  cabinetMeshes.push(door1, door2);
+  // Handles
+  handle(x - w*0.24, h*0.48, z - d/2 + 0.035);
+  handle(x + w*0.24, h*0.48, z - d/2 + 0.035);
+  // Toe kick
+  const kick = box(w, 0.1, d, mats.hardware, x, 0.05, z);
+  return c;
+}
+
+function upperCabinet(x, z, w=0.6, h=0.65, d=0.34, yPos=2.1) {
+  const c = box(w-0.01, h, d-0.01, mats.cabinet, x, yPos + h/2, z);
+  cabinetMeshes.push(c);
+  const door = box(w*0.84, h*0.8, 0.015, mats.cabinetEdge, x, yPos + h/2, z - d/2 + 0.018);
+  cabinetMeshes.push(door);
+  handle(x, yPos + h/2 - h*0.3, z - d/2 + 0.028);
+  return c;
+}
+
+function counter(x, z, w, d=0.62) {
+  const ct = box(w, 0.04, d, mats.counter, x, 0.9, z);
+  counterMeshes.push(ct);
+  // Overhang lip
+  const lip = box(w, 0.025, 0.025, mats.counter, x, 0.878, z - d/2 + 0.012);
+  counterMeshes.push(lip);
+  return ct;
+}
+
+// ── BACK WALL CABINETS ───────────────────────────────────────────────────────
+const BWZ = -3.1; // back wall Z for cabinets
+const starts = [-3.6, -3.0, -2.4, -1.8, -1.2, -0.6, 0, 0.6, 1.2, 1.8];
+starts.forEach(x => {
+  baseCabinet(x, BWZ);
+  upperCabinet(x, BWZ + 0.11, 0.6, 0.68, 0.34, 2.1);
+});
+
+// Counter along back wall
+counter(-1.8, BWZ + 0.03, 6.0);
+
+// Backsplash (between upper and lower)
+const bs = box(6.0, 0.78, 0.06, mats.backsplash, -1.8, 1.55, BWZ + 0.06);
+
+// Under-cabinet LED strip
+const led = box(5.8, 0.02, 0.02, mats.led, -1.8, 2.06, BWZ + 0.2);
+
+// ── LEFT WALL CABINETS ───────────────────────────────────────────────────────
+const LWX = -4.4;
+[-2.4, -3.0, -3.6].forEach(z => {
+  baseCabinet(LWX + 0.28, z, 0.56, 0.88, 0.56);
+  upperCabinet(LWX + 0.17, z, 0.34, 0.65, 0.34, 2.1);
+});
+counter(LWX + 0.28 - 0.0, -2.95, 0.56, 0.58);
+const lbs = box(0.56, 0.78, 1.8, mats.backsplash, LWX + 0.08, 1.55, -2.95);
+
+// ── PANTRY TOWER (tall unit right side of back wall) ─────────────────────────
+const panx = 2.4;
+const pantry = box(0.6, 2.2, 0.58, mats.cabinet, panx, 1.1, BWZ);
+cabinetMeshes.push(pantry);
+// 3 doors
+[-0.62,-0.15,0.32].forEach(yo => {
+  const d2 = box(0.52, 0.64, 0.02, mats.cabinetEdge, panx, 1.1 + yo, BWZ - 0.3);
+  cabinetMeshes.push(d2);
+  handle(panx, 1.1 + yo - 0.22, BWZ - 0.31);
+});
+
+// ── REFRIGERATOR ─────────────────────────────────────────────────────────────
+const fridgeX = 3.5;
+const fridge = box(0.82, 2.1, 0.72, mats.steel, fridgeX, 1.05, BWZ + 0.07);
+// Handle
+const fh1 = box(0.04, 0.5, 0.04, mats.hardware, fridgeX - 0.44, 1.5, BWZ - 0.29);
+const fh2 = box(0.04, 0.5, 0.04, mats.hardware, fridgeX - 0.44, 0.9, BWZ - 0.29);
+// Fridge line
+const fline = box(0.82, 0.01, 0.72, mats.hardware, fridgeX, 1.3, BWZ + 0.07);
+
+// ── BUILT-IN OVEN (in back wall cabinet run) ─────────────────────────────────
+const ovenX = 3.0;
+const oven = box(0.58, 0.58, 0.55, mats.steel, ovenX, 0.5, BWZ + 0.02);
+const ovenDoor = box(0.52, 0.5, 0.03, mats.hardware, ovenX, 0.5, BWZ - 0.25);
+const microwave = box(0.58, 0.35, 0.4, mats.steel, ovenX, 1.22, BWZ + 0.07);
+const mwDoor = box(0.52, 0.3, 0.03, mats.hardware, ovenX, 1.22, BWZ - 0.13);
+// Handles
+box(0.35, 0.025, 0.025, mats.steel, ovenX, 0.75, BWZ - 0.265);
+box(0.35, 0.025, 0.025, mats.steel, ovenX, 1.4,  BWZ - 0.145);
+
+// ── ISLAND ───────────────────────────────────────────────────────────────────
+const islandX = -0.5;
+const islandZ = 0.8;
+const islandW = 2.4;
+const islandD = 1.0;
+
+// Island cabinets — both sides
+for (let ix = -0.9; ix <= 0.9; ix += 0.6) {
+  const ic = box(0.58, 0.88, islandD - 0.02, mats.cabinet, islandX + ix, 0.44, islandZ);
+  cabinetMeshes.push(ic);
+  // Doors on both sides
+  const idA = box(0.5, 0.64, 0.015, mats.cabinetEdge, islandX + ix, 0.44, islandZ - islandD/2 + 0.018);
+  const idB = box(0.5, 0.64, 0.015, mats.cabinetEdge, islandX + ix, 0.44, islandZ + islandD/2 - 0.018);
+  cabinetMeshes.push(idA, idB);
+  handle(islandX + ix, 0.25, islandZ - islandD/2 + 0.028);
+  handle(islandX + ix, 0.25, islandZ + islandD/2 - 0.028);
+}
+
+// Island countertop — waterfall edge
+const islandCt = box(islandW, 0.05, islandD + 0.08, mats.counter, islandX, 0.915, islandZ);
+counterMeshes.push(islandCt);
+// Waterfall sides
+const waterL = box(0.05, 0.9, islandD + 0.08, mats.counter, islandX - islandW/2 - 0.025, 0.46, islandZ);
+const waterR = box(0.05, 0.9, islandD + 0.08, mats.counter, islandX + islandW/2 + 0.025, 0.46, islandZ);
+counterMeshes.push(waterL, waterR);
+
+// ── BAR STOOLS ───────────────────────────────────────────────────────────────
+[-0.8, 0.0, 0.8].forEach(sx => {
+  const seat = box(0.32, 0.04, 0.32, mats.hardware, islandX + sx, 0.82, islandZ + islandD/2 + 0.2);
+  const legL = box(0.025, 0.8, 0.025, mats.hardware, islandX + sx - 0.12, 0.4, islandZ + islandD/2 + 0.2 - 0.1);
+  const legR = box(0.025, 0.8, 0.025, mats.hardware, islandX + sx + 0.12, 0.4, islandZ + islandD/2 + 0.2 - 0.1);
+  const legLB = box(0.025, 0.8, 0.025, mats.hardware, islandX + sx - 0.12, 0.4, islandZ + islandD/2 + 0.2 + 0.1);
+  const legRB = box(0.025, 0.8, 0.025, mats.hardware, islandX + sx + 0.12, 0.4, islandZ + islandD/2 + 0.2 + 0.1);
+  const foot  = box(0.28, 0.025, 0.025, mats.hardware, islandX + sx, 0.44, islandZ + islandD/2 + 0.2);
+});
+
+// ── SINK (in island) ─────────────────────────────────────────────────────────
+const sinkBasin = box(0.5, 0.02, 0.35, mats.steel, islandX - 0.7, 0.92, islandZ);
+const faucetBase = box(0.04, 0.04, 0.04, mats.steel, islandX - 0.7, 0.96, islandZ - 0.12);
+const faucetArm  = box(0.04, 0.26, 0.04, mats.steel, islandX - 0.7, 1.07, islandZ - 0.12);
+const faucetSpout= box(0.2,  0.04, 0.04, mats.steel, islandX - 0.6, 1.19, islandZ - 0.12);
+
+// ── PENDANT LIGHTS ABOVE ISLAND ──────────────────────────────────────────────
+[-0.6, 0.0, 0.6].forEach(px => {
+  // Cord
+  box(0.015, 0.6, 0.015, mats.hardware, islandX + px, 3.7, islandZ - 0.1);
+  // Shade (inverted cone shape via scaled box)
+  const shade = box(0.22, 0.15, 0.22, mats.hardware, islandX + px, 3.38, islandZ - 0.1);
+  shade.scale.set(1, 1, 1);
+});
+
+// ── CEILING RECESSED LIGHTS ──────────────────────────────────────────────────
+[[−1.8,−2.8],[1.8,−2.8],[−1.8,0.4],[1.8,0.4],[0,0.4],[0,−2.8]].forEach(([lx,lz]) => {
+  box(0.15, 0.04, 0.15, mats.hardware, lx, 4.44, lz);
+});
+
+// ── WINDOW ───────────────────────────────────────────────────────────────────
+const win = box(1.4, 1.0, 0.08, mats.glass, -4.96, 2.2, -0.5);
+// Window frame
+box(1.4, 0.06, 0.1, mats.wall, -4.96, 2.72, -0.5);
+box(1.4, 0.06, 0.1, mats.wall, -4.96, 1.68, -0.5);
+box(0.06, 1.0, 0.1, mats.wall, -5.67, 2.2, -0.5);
+box(0.06, 1.0, 0.1, mats.wall, -4.25, 2.2, -0.5);
+
+// ── LIGHTS ───────────────────────────────────────────────────────────────────
+const ambientLight = new THREE.AmbientLight(0xFFF5E8, 0.6);
+scene.add(ambientLight);
+
+const sunLight = new THREE.DirectionalLight(0xFFEDD5, 1.4);
+sunLight.position.set(4, 8, 5);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.set(2048, 2048);
+sunLight.shadow.camera.near = 0.5;
+sunLight.shadow.camera.far  = 30;
+sunLight.shadow.camera.left = -8;
+sunLight.shadow.camera.right = 8;
+sunLight.shadow.camera.top  = 8;
+sunLight.shadow.camera.bottom = -8;
+sunLight.shadow.bias = -0.001;
+scene.add(sunLight);
+
+// Ceiling fill
+const fillLight = new THREE.PointLight(0xFFF8F0, 0.8, 12);
+fillLight.position.set(0, 4, 0);
+scene.add(fillLight);
+
+// Pendant lights above island
+const p1 = new THREE.PointLight(0xFFEE99, 1.2, 3.5);
+p1.position.set(islandX - 0.6, 3.3, islandZ - 0.1);
+const p2 = new THREE.PointLight(0xFFEE99, 1.2, 3.5);
+p2.position.set(islandX,       3.3, islandZ - 0.1);
+const p3 = new THREE.PointLight(0xFFEE99, 1.2, 3.5);
+p3.position.set(islandX + 0.6, 3.3, islandZ - 0.1);
+scene.add(p1, p2, p3);
+
+// Under-cabinet warm LED
+const ledLight = new THREE.RectAreaLight ? null : new THREE.PointLight(0xFFF0CC, 0.5, 3);
+if (ledLight) { ledLight.position.set(-1.8, 2.1, -2.8); scene.add(ledLight); }
+
+// Store refs for lighting changes
+const lights = { ambient: ambientLight, sun: sunLight, fill: fillLight, pendants: [p1,p2,p3] };
+
+// ── COLOR SWATCHES ────────────────────────────────────────────────────────────
+const cabinetNames = {
+  '#8B6B2E':'Warm Wood','#FFFFFF':'White','#3D4A52':'Slate Grey',
+  '#1C1C1C':'Matte Black','#B8C4BB':'Sage','#C4933F':'Gold'
+};
+const counterNames = {
+  '#E8E4DC':'White Quartz','#2A2A2A':'Black Granite',
+  '#C8B89A':'Marble Beige','#7A8B7C':'Green Quartz'
+};
+
+document.querySelectorAll('#cabinetColors .color-swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('#cabinetColors .color-swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+    const col = new THREE.Color(sw.dataset.color);
+    cabinetMeshes.forEach(m => {
+      if (Array.isArray(m.material)) m.material.forEach(mt => { if(mt.color) mt.color.set(col); });
+      else if (m.material.color) m.material.color.set(col);
+    });
+    mats.cabinet.color.set(col);
+    mats.cabinetEdge.color.set(col).multiplyScalar(0.78);
+    document.getElementById('infoStyle').textContent = cabinetNames[sw.dataset.color] || sw.dataset.color;
+  });
+});
+
+document.querySelectorAll('#counterColors .color-swatch').forEach(sw => {
+  sw.addEventListener('click', () => {
+    document.querySelectorAll('#counterColors .color-swatch').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+    const col = new THREE.Color(sw.dataset.color);
+    counterMeshes.forEach(m => {
+      if (m.material.color) m.material.color.set(col);
+    });
+    mats.counter.color.set(col);
+    document.getElementById('infoCt').textContent = counterNames[sw.dataset.color] || sw.dataset.color;
+  });
+});
+
+// ── CAMERA VIEWS ──────────────────────────────────────────────────────────────
+const views = {
+  front:  { pos:[5.5, 3.2, 6.0],   target:[0, 1.2, 0] },
+  side:   { pos:[-6.5, 2.8, 1.5],  target:[0, 1.2, -1.5] },
+  top:    { pos:[0, 10, 0.1],       target:[0, 0, 0] },
+  island: { pos:[islandX+0.5, 2.0, islandZ+3.5], target:[islandX, 0.9, islandZ] },
+};
+
+function setView(name) {
+  document.querySelectorAll('[id^=view]').forEach(b => b.classList.remove('active'));
+  document.getElementById('view' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+  const v = views[name];
+  gsap.to(camera.position, { x:v.pos[0], y:v.pos[1], z:v.pos[2], duration:1.4, ease:'power3.inOut' });
+  gsap.to(controls.target, { x:v.target[0], y:v.target[1], z:v.target[2], duration:1.4, ease:'power3.inOut',
+    onUpdate: () => controls.update() });
+}
+
+// ── LIGHTING MODES ───────────────────────────────────────────────────────────
+function setLight(mode) {
+  document.querySelectorAll('[id^=light]').forEach(b => b.classList.remove('active'));
+  document.getElementById('light' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+  if (mode === 'day') {
+    gsap.to(lights.ambient, { intensity:0.6, duration:.8 });
+    gsap.to(lights.sun, { intensity:1.4, duration:.8 });
+    lights.pendants.forEach(p => gsap.to(p, { intensity:1.2, duration:.8 }));
+    renderer.toneMappingExposure = 1.1;
+    scene.background.set(0x0d0d0f);
+    scene.fog = new THREE.FogExp2(0x0d0d0f, 0.04);
+  } else if (mode === 'night') {
+    gsap.to(lights.ambient, { intensity:0.15, duration:.8 });
+    gsap.to(lights.sun, { intensity:0.1, duration:.8 });
+    lights.pendants.forEach(p => gsap.to(p, { intensity:3.0, duration:.8 }));
+    renderer.toneMappingExposure = 0.85;
+    scene.background.set(0x050508);
+    scene.fog = new THREE.FogExp2(0x050508, 0.06);
+  } else if (mode === 'drama') {
+    gsap.to(lights.ambient, { intensity:0.12, duration:.8 });
+    gsap.to(lights.sun, { intensity:3.0, duration:.8 });
+    lights.pendants.forEach(p => gsap.to(p, { intensity:0.4, duration:.8 }));
+    renderer.toneMappingExposure = 1.4;
+    scene.background.set(0x080406);
+  }
+}
+
+// ── ANIMATE LOOP ─────────────────────────────────────────────────────────────
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  // Gentle pendant sway
+  const t = Date.now() * 0.001;
+  p1.position.x = islandX - 0.6 + Math.sin(t * 0.7) * 0.015;
+  p2.position.x = islandX      + Math.sin(t * 0.9 + 1) * 0.015;
+  p3.position.x = islandX + 0.6 + Math.sin(t * 0.8 + 2) * 0.015;
+  renderer.render(scene, camera);
+}
+animate();
+
+// ── RESIZE ───────────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ── LOADING ANIMATION ────────────────────────────────────────────────────────
+const loadFill = document.getElementById('loadFill');
+const loader   = document.getElementById('loading');
+let progress   = 0;
+const loadInterval = setInterval(() => {
+  progress = Math.min(progress + Math.random() * 18, 100);
+  loadFill.style.width = progress + '%';
+  if (progress >= 100) {
+    clearInterval(loadInterval);
+    setTimeout(() => {
+      gsap.to(loader, { opacity:0, duration:.6, onComplete:() => loader.style.display='none' });
+      // Intro camera sweep
+      gsap.from(camera.position, {
+        x: 2, y: 6, z: 12, duration: 2.4, ease:'power3.inOut',
+        onUpdate: () => controls.update()
+      });
+    }, 300);
+  }
+}, 60);
+</script>
+</body>
+</html>
